@@ -1,0 +1,325 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>内网代理转发实验 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="内网代理转发实验 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="
+学习为目的，较基础，巩固知识用，参考意义不大。
+
+正反两层隧道搭建
+反向frp+正向iox
+背景：
+拥有两台主机权限，两台机器处于不同的网段且有隔离，通过使用第一台主机建立反向隧道，第二台机器建立正向隧道，打通多层网络。
+环境：
+拥有一台..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              内网代理转发实验
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-07-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/03/27/89f7974feb685.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <blockquote>
+<p>学习为目的，较基础，巩固知识用，参考意义不大。</p>
+</blockquote>
+<h1 id="正反两层隧道搭建">正反两层隧道搭建</h1>
+<p><strong>反向frp+正向iox</strong></p>
+<p>背景：</p>
+<p>拥有两台主机权限，两台机器处于不同的网段且有隔离，通过使用第一台主机建立反向隧道，第二台机器建立正向隧道，打通多层网络。</p>
+<p>环境：</p>
+<p>拥有一台公网vps，两台虚拟机</p>
+<ul>
+<li>s1 Centos8 单网卡 nat模式 <code>10.211.55.5</code></li>
+<li>s2 Ubuntu20.4 双网卡 nat模式<code>10.211.55.3</code>，另一张为仅主机模式<code>10.37.129.4</code></li>
+</ul>
+<p>该情况下s1无法访问到s2的仅主机网卡ip，通过搭建多级隧道使攻击机可访问到s2的仅主机网卡，打通多级网络。</p>
+<p><strong>frps配置文件参考：</strong></p>
+<pre><code class="language-纯文本">[common]
+bind_addr = 0.0.0.0
+bind_port = bind port
+dashboard_addr = 0.0.0.0
+dashboard_port = dashboard port
+dashboard_user = username
+dashboard_pwd = password
+token = token
+heartbeat_timeout = 90
+detailed_errors_to_client = false
+tls_only = true
+max_pool_count = 10
+</code></pre>
+<p><strong>frpc配置文件参考：</strong></p>
+<pre><code class="language-纯文本">[common]
+server_addr = serverip
+server_port = bind port
+token = token
+pool_count = 10
+protocol = tcp
+tls_enable = true
+
+[FRP2iox]
+type = tcp
+remote_port = remote port
+plugin = socks5
+plugin_user = abc@123
+plugin_passwd = ABC@123..
+use_encryption = true
+use_compression = true
+</code></pre>
+<pre><code class="language-纯文本">[common]
+server_addr = ****
+server_port = 8443
+token = Jlhvv123
+pool_count = 10
+protocol = tcp
+tls_enable = true
+
+[192.168.100.227-huarun]
+type = tcp
+remote_port = 6211
+plugin = socks5
+plugin_user = 账号
+plugin_passwd = 密码
+</code></pre>
+<h2 id="第一层-frp反向代理">第一层 FRP反向代理</h2>
+<p>第一层采用npc搭建<strong>反向隧道</strong>，也就是别人主动连接我们的VPS。</p>
+<p>在centos：10.211.55.5下运行</p>
+<pre><code class="language-纯文本">./frpc -c frpc.ini
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/03/27/93fa40e710878.png" alt="" loading="lazy"></figure>
+<p>实战可以用nohup命令加&amp;后台常驻。即</p>
+<pre><code class="language-纯文本">nohup ./frpc -c frpc.ini &amp;
+</code></pre>
+<blockquote>
+<p>实战中隧道建立成功后立即删除frpc.ini防止被溯源或者被其他攻击队发现。</p>
+</blockquote>
+<p><strong>Proxifier工具一定要精确的IP段，避免网络风暴。吃过亏，半天连不上。</strong></p>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/03/27/bde834f482661.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/03/27/b14adf2f9e2f7.png" alt="" loading="lazy"></figure>
+<h2 id="第二层-iox正向代理">第二层 IOX正向代理</h2>
+<p>攻击机—&gt;s1隧道打通，打通攻击机到s2。</p>
+<p>首先搭建s1--&gt;s2的隧道</p>
+<p>双网卡主机10.211.55.3 ubuntu上运行</p>
+<pre><code class="language-纯文本">./iox proxy -l 40555
+</code></pre>
+<p>在本机Proxifier创建一条隧道</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/03/27/7d25ba7a3fc1a.png" alt="" loading="lazy"></figure>
+<p>按理来说本机是通不到s2的host only段的应该创建一条代理链从，frp代理出下再接一条第二层iox的代理。</p>
+<p>注意顺序⚠️。</p>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/03/27/1a9a46cde0f75.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/03/27/2e2658f16e12b.png" alt="" loading="lazy"></figure>
+<h2 id="第二层-gost正向代理">第二层 Gost正向代理</h2>
+<p>Gost也是一款优秀的代理工具，GO语言编写。地址：<a href="https://github.com/ginuerzh/gost">https://github.com/ginuerzh/gost</a></p>
+<p>同上ubuntu运行。</p>
+<p><strong>错误❌用法：</strong></p>
+<pre><code class="language-纯文本">./gost-linux-amd64 -L=sangfor:123456@localhost:40555
+</code></pre>
+<blockquote>
+<p>注意官方写的介绍这上面使用的localhost，是用坑的，用localhost监听不到。要不不填要不填0.0.0.0，也不是什么大问题，有基础的都看得出。</p>
+</blockquote>
+<p><strong>正确用法：</strong></p>
+<pre><code class="language-纯文本">./gost-linux-amd64 -L=sangfor:123456@:40555
+</code></pre>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/03/27/89f7974feb685.png" alt="" loading="lazy"></figure>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%AD%A3%E5%8F%8D%E4%B8%A4%E5%B1%82%E9%9A%A7%E9%81%93%E6%90%AD%E5%BB%BA">正反两层隧道搭建</a>
+<ul>
+<li><a href="#%E7%AC%AC%E4%B8%80%E5%B1%82-frp%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86">第一层 FRP反向代理</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E5%B1%82-iox%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86">第二层 IOX正向代理</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E5%B1%82-gost%E6%AD%A3%E5%90%91%E4%BB%A3%E7%90%86">第二层 Gost正向代理</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/PKsIONK2s/">
+              <h3 class="post-title">
+                隐匿C2
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

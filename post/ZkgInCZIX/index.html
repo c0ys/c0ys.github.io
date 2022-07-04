@@ -1,0 +1,258 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CrossC2踩坑 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="CrossC2踩坑 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="记录一下流程，因为之前一直没成功，和遇到的一些坑。
+启动流程
+准备以下文件，加载图中的cna即可。
+
+./genCrossC2.MacOS 42.* 443 beacon_keys null Linux x64 cc2.out
+./genC..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              CrossC2踩坑
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-04-13
+              </span>
+              <span>
+                1 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/04/13/28f1eb0b54907.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>记录一下流程，因为之前一直没成功，和遇到的一些坑。</p>
+<h2 id="启动流程">启动流程</h2>
+<p>准备以下文件，加载图中的cna即可。</p>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/04/13/30a6a8220118b.png" alt="" loading="lazy"></figure>
+<pre><code class="language-bash">./genCrossC2.MacOS 42.* 443 beacon_keys null Linux x64 cc2.out
+./genCrossC2.MacOS 42.* 443 beacon_keys null MacOS x64 mac.out
+</code></pre>
+<h2 id="坑">坑</h2>
+<ul>
+<li>
+<p>路径<code>$CC2_PATH </code>后面记得加一层路径<code>/</code>，<code>genCrossC2.MacOS</code>记得给权限 </p>
+<p>不然你就会很蠢，索性终端里操作都更方便些。</p>
+</li>
+<li>
+<p>本地的<code>cobaltstrike.beacon_keys</code>就行。</p>
+<p>还有这里都让去下server端的，我就以为是下服务端的。网上教程大都粗糙劣质，不如官方wiki说明。其实本地的这个key也行，反正客户端和服务端文件都一样，为此我还算了md5，但为啥mac和linux的计算结果不一样。</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/04/13/b30db3e00719d.png" alt="" loading="lazy"></figure>
+<ul>
+<li>偶然的发现win7的https模块上线不了，网上有说法。</li>
+</ul>
+<h2 id="效果">效果</h2>
+<h3 id="macos-linux">MacOS &amp; Linux</h3>
+<p>mac和linux都比较完美支持。</p>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/04/13/28f1eb0b54907.png" alt="" loading="lazy"></figure>
+<p>但mac权限做的比较好，如果钓鱼的话，查看文件可能会被发现。</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/04/13/515e5d8efef63.png" alt="" loading="lazy"></figure>
+<h3 id="android">Android</h3>
+<p>有点可惜，没开放功能。</p>
+<h3 id="ios">IOS</h3>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B">启动流程</a></li>
+<li><a href="#%E5%9D%91">坑</a></li>
+<li><a href="#%E6%95%88%E6%9E%9C">效果</a>
+<ul>
+<li><a href="#macos-linux">MacOS &amp; Linux</a></li>
+<li><a href="#android">Android</a></li>
+<li><a href="#ios">IOS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/U0y0K87wO/">
+              <h3 class="post-title">
+                Spring Rce 初体验（核弹二重唱）
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

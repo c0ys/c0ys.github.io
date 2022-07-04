@@ -1,0 +1,368 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prestige-P100黑苹果实录 | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Prestige-P100黑苹果实录 | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="配置 - MSI Prestige P100
+
+显卡原为MSI RX580 ARMOR 2048SP，降级vbios为蓝宝石 RX570用来免驱。
+
+
+
+电脑型号：
+微星 Z390 Prestige P100
+
+
+
+
+处理器：
+英特尔 Co..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Prestige-P100黑苹果实录
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-03-11
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/04/08/4e2f84dcfaede.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="配置-msi-prestige-p100">配置 - MSI Prestige P100</h1>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/04/08/f22f4f830bf15.jpg" alt="" loading="lazy"></figure>
+<p>显卡原为<code>MSI RX580 ARMOR 2048SP</code>，降级vbios为<code>蓝宝石 RX570</code>用来免驱。</p>
+<table>
+<thead>
+<tr>
+<th>电脑型号：</th>
+<th>微星 Z390 Prestige P100</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>处理器：</td>
+<td>英特尔 Core i5-9400F @ 2.90GHz 六核</td>
+</tr>
+<tr>
+<td>主板：</td>
+<td>微星 MPG Z390I GAMING EDGE AC (MS-7C04) ( Z390 芯片组 )</td>
+</tr>
+<tr>
+<td>内存：</td>
+<td>16 GB ( 海盗船 DDR4 2400MHz )</td>
+</tr>
+<tr>
+<td>主硬盘：</td>
+<td>HS-SSD-C2000 512GB ( 512 GB / 固态硬盘 )</td>
+</tr>
+<tr>
+<td>显卡：</td>
+<td>AMD Radeon RX 570 ( 8 GB / 蓝宝石 )</td>
+</tr>
+<tr>
+<td>声卡：</td>
+<td>瑞昱 ALC892 @ 英特尔 High Definition Audio 控制器</td>
+</tr>
+<tr>
+<td>网卡：</td>
+<td>瑞昱 RTL8168/8111/8112 Gigabit Ethernet Controller / 微星</td>
+</tr>
+</tbody>
+</table>
+<h1 id="起因-怀疑卡顿原因">起因 - 怀疑卡顿原因</h1>
+<p>笔记本黑苹果体验还是很好的，hidpi开启后，高分辨率的享受让我如痴如醉，但是就一弊端，<code>卡顿</code>，我思考相关的原因。</p>
+<ul>
+<li>
+<p><code>HD630</code>过于弱鸡但是白苹果也是同样，确为何如此丝滑？</p>
+</li>
+<li>
+<p>黑苹果驱动不完善这个是头疼的，玄学问题，也不知道哪的问题。看我寻思着也不应该呀，我电脑配置不算低把？带着疑惑接着往下走。</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>后话：其实问题就是HIDPI开启后，显卡过载导致系统缓慢，白苹果原生支持HIDPI，源于自身硬件屏幕素质过硬。</strong> 找出这个的原因代价可真是有够大，费了不少心血。</p>
+</blockquote>
+<p>由于这个原因，我十分想探索为何如此，因此我把我的毒手伸向了我的台式—<code>Prestige P100</code>，一台微星设计师系列的主机。</p>
+<p>如果台式机能流畅运行(<code>RX580独立显卡硬解</code>)的话？是不是能排除一些问题呢？如果台式机用显卡十分流畅，那就可以确定在显卡的问题上。</p>
+<p>不光是为了排除一些问题，电脑摆在这，实在是想折腾一下呀。<code>成就：无味的折腾</code></p>
+<h1 id="豪赌-强刷显卡bios">豪赌 - 强刷显卡bios</h1>
+<p>台式机安装黑苹果这个想法我之前就有过，但是存在两大问题。</p>
+<ul>
+<li>
+<p>显卡我的显卡是<code>RX580 2048sp</code>，之前大家都说不能驱动黑苹果，因为这是一张换皮的<code>RX570</code>，现在网上还是很多硬件购买特地声明不要购买这款，不巧，这张卡早在我手里了。这下难搞了把，但是还是有大神冒着试试的态度，刷<code>RX570</code>的vbios，结果成功，黑苹果免驱。这听起来可真的是诱惑人呀！<strong>但是刷bios风险巨大，万一刷砖了，我可没东西救，cpu</strong>没核显，itx主板没有多余的pcie槽，也就是我刷崩了我就电脑不能用了基本，这注定是一场有去无归的一场赌博。 <code>达成成就：殊死一搏</code></p>
+<blockquote>
+<p>其实我已经想好了后路，买个一个核显的奔腾亮机。但是又是一笔支出。<code>成就：完善的安排</code></p>
+</blockquote>
+</li>
+<li>
+<p>无线网卡无线网卡拆装巨大，今天拆机看了，基本要拆下主板才能卸下了，这机子，实在拆不动了，点到为止。还是用usb网卡和usb蓝牙把。itx限制了。</p>
+</li>
+</ul>
+<p>但上面的风险仍然是阻止不了我想刷显卡的心，毕竟高收益可是<strong>黑苹果免驱</strong>，不用再去买新卡，卖旧卡，现在手里的这张卡就可以免驱，只要你敢试！</p>
+<p>因为我知道放着这个可能能免驱的显卡在我这，迟早要被刷bios，逃不过我的，反正迟早要刷，这是一条不归路，<strong>成败就在一瞬之间</strong>。</p>
+<p>也不知道我按下刷下bios的回车键之后我心里多忐忑，又激动又是紧张的。</p>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/04/08/4e2f84dcfaede.png" alt="" loading="lazy"></figure>
+<p>刚开机的时候，显示器没反应，我一边放着<a href="https://www.bilibili.com/video/av17194098?from=search&amp;seid=320033393179248033" title="小缘的好运来">小缘的好运来</a>，一边等着回应，没有反应。但我还是因悲生喜，激动的狂笑，听起来怪矛盾的，因为出问题了，我又能折腾了，又可以把他修好了，去享受修好的成就感。</p>
+<p>几番尝试之后，阴差阳错下，我开始察觉不对<code>成就：要素察觉！</code>，我试着重新拔了dp口，换了个口！？成了！！显示器亮了！！！手机里，<a href="https://www.bilibili.com/video/av17194098?from=search&amp;seid=320033393179248033" title="小缘的好运来">小缘的好运来</a>还放着，我真的是激动的要跳起来了！！！这是我这几天最激动的事！简直和拿奖一样，这是一场<strong>豪赌</strong>，我赌对了。我还凭借我敏锐的直觉发现了问题，简直不能太高兴，万一GG了，代价可就大了去。</p>
+<blockquote>
+<p>也许给我一张双bios的显卡，或者多pcie插槽的主板，核显的cpu，其他的电脑等救砖手段，我可能还不会这么激动。因为当我做出这个决定的时候，我已经没有回头路了。也不知道我冒了多大的勇气。</p>
+</blockquote>
+<p>但是还是发现一个小问题，3个dp口，原来插的那个dp口不能用了，其他正常，也无伤大雅把。<code>成就：必要的牺牲</code></p>
+<p><code>Hackintosh</code>中<code>RX580 2048sp</code>免驱成功！</p>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/04/08/e3c3cae4fff48.png" alt="" loading="lazy"></figure>
+<p>假的还有模有样。</p>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/04/08/42c2590fb0f97.png" alt="" loading="lazy"></figure>
+<h1 id="安装-枯燥的等待">安装 - 枯燥的等待</h1>
+<p>台式机中问题还是有点小多，但是后面都莫名其妙的解决了。</p>
+<ul>
+<li>
+<p>保持windows稳定的前提下改硬盘格式 <code>RAID -&gt; AHCI</code>百度解决。安全模式很简单。</p>
+</li>
+<li>
+<p>安装花屏，卡机，速度缓慢换成rx570之后，原来的efi总是有线条，花屏到不算，但很慢，一看就是显卡驱动那问题，装了很多遍，也是这个过程中认识了oc。这是今天最难熬的部分，因为加载一次很慢，要十几分钟不止，而且还是必须要等跑完才能获取足够信息。换了很多efi，耗费大量时间。而且还是台式机，装机的时候，没有闲置的电脑可以查找资料。这个过程大概持续了2-3个小时，后面我慢慢理清思绪，不能再这么盲目的try下去，把我笔记本安顿好之后，我试着去找efi，又回到那个。黑心网站店，看到一个和我配置很相近的，竟然还要收费，<code>一块钱</code>。哎，算了，像恶势力低头。<code>成就：生活的无奈</code></p>
+</li>
+</ul>
+<h1 id="现在-想说的话">现在 - 想说的话</h1>
+<p>先不管那么多兼容问题，不知不觉又忙了半天，从<code>中午12:30</code>左右开始的吧，起码是装上了，双系统正常。</p>
+<blockquote>
+<p>为了拆机看无线网卡，硅脂还闹了一茬，7921太难涂了，今天刚好用完。ITX机箱又难拆，拆下换硅脂特累，返工两次。拆机清灰，一探网卡究竟，换硅脂也花了个把小时。</p>
+</blockquote>
+<p>mac体验究极丝滑，良好，舒适，稍微安慰一下自己。</p>
+<p>现在是<code>晚上12:59</code>，用的操作系统是mac os，尽管很幸苦，但是今天这么一折腾还是搞懂很多东西。</p>
+<blockquote>
+<p>事情的原由是笔记本黑苹果操作过于卡顿，我以为是我的黑苹果配置不完善，直到一个小时前，我在笔记本重新装了（原256ssd转到台式，先128gssd），操作非常流畅，我就很好奇了？开始疑惑，也就是折腾完一天快结束的时候我才想到会不会是hidpi？因为现在的配置和之前差别最大的就是在hidpi，果然查一查，网上是通病，可怜的hd630承载了不该承受的压力，放大分辨率，显卡过载，也能理解。</p>
+</blockquote>
+<ul>
+<li>
+<p><strong>笔记本Hackintosh卡顿的原因是hidpi！</strong></p>
+</li>
+<li>
+<p><strong>笔记本Hackintosh卡顿的原因是hidpi！</strong></p>
+</li>
+<li>
+<p><strong>笔记本Hackintosh卡顿的原因是hidpi！</strong></p>
+</li>
+</ul>
+<p>了解新知识，准备学习</p>
+<ul>
+<li><strong>oc引导</strong></li>
+</ul>
+<p>累累累，想休息，现在有个软一点材质靠着最好了。😔累一天了，晚安。am1:25.</p>
+<h1 id="翻车-显卡灰屏">翻车 - 显卡灰屏</h1>
+<p>刚好用了一周，cao，有次刚准备打危机合约的时候，刚打开mumu屏幕就灰屏，gg，所有方法都试了，基本可以确定是显卡的问题，而且是进不去系统的那种。</p>
+<blockquote>
+<p>在b站看到有人才，如果能进系统，用讲述人功能 + 盲键盘刷回bios，那个我是真的佩服，小破站人才众多。</p>
+</blockquote>
+<p>没办法，z390其实可以支持6代u的，但是也不能直接支持，省心还是上了9代的赛扬g4930，其实其他的都没货了而已，哎，两百六大洋呀，就为了亮机。</p>
+<p>等了三天，东西到了，硅脂还掉了点到插槽里，把我触目惊心的，啊，这可是1200的主板呀！中途因为硅脂开不了机，搞得我慌的很，最后拿镊子纳米级工艺修复好了。</p>
+<p>一下午，好累，这itx拆散热器巨麻烦，而且那垃圾赛扬也太慢了，我开机自启软件都能让他反应半年，最后还是大吉大利，修复成功。</p>
+<p><code>达成成就：奇怪的教训增加了</code></p>
+<ul>
+<li>
+<p>我发现用上9400f也很幸福了，用过好的才知道慢的有多不能忍</p>
+</li>
+<li>
+<p>再也不想拆那个散热器了，除非必要，累</p>
+</li>
+<li>
+<p>没事不敢乱动显卡bios了，这台机器特殊，修复起来过于麻烦</p>
+</li>
+</ul>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E9%85%8D%E7%BD%AE-msi-prestige-p100">配置 - MSI Prestige P100</a></li>
+<li><a href="#%E8%B5%B7%E5%9B%A0-%E6%80%80%E7%96%91%E5%8D%A1%E9%A1%BF%E5%8E%9F%E5%9B%A0">起因 - 怀疑卡顿原因</a></li>
+<li><a href="#%E8%B1%AA%E8%B5%8C-%E5%BC%BA%E5%88%B7%E6%98%BE%E5%8D%A1bios">豪赌 - 强刷显卡bios</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85-%E6%9E%AF%E7%87%A5%E7%9A%84%E7%AD%89%E5%BE%85">安装 - 枯燥的等待</a></li>
+<li><a href="#%E7%8E%B0%E5%9C%A8-%E6%83%B3%E8%AF%B4%E7%9A%84%E8%AF%9D">现在 - 想说的话</a></li>
+<li><a href="#%E7%BF%BB%E8%BD%A6-%E6%98%BE%E5%8D%A1%E7%81%B0%E5%B1%8F">翻车 - 显卡灰屏</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/lH5w9hPc3/">
+              <h3 class="post-title">
+                MSI-GL62M黑苹果实录
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

